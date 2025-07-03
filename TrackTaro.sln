@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackTaro.Api", "TrackTaro.Api\TrackTaro.Api.csproj", "{BE38D68A-42D6-4975-9453-BE79EBBE37B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackTaro.Web", "TrackTaro.Web\TrackTaro.Web.csproj", "{6CA595A0-5240-45A9-9DBA-EF32DA7745AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackTaro.Shared", "TrackTaro.Shared\TrackTaro.Shared.csproj", "{72925E4F-4579-4016-820B-2B58DDF6EC63}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE38D68A-42D6-4975-9453-BE79EBBE37B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE38D68A-42D6-4975-9453-BE79EBBE37B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE38D68A-42D6-4975-9453-BE79EBBE37B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE38D68A-42D6-4975-9453-BE79EBBE37B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CA595A0-5240-45A9-9DBA-EF32DA7745AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CA595A0-5240-45A9-9DBA-EF32DA7745AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CA595A0-5240-45A9-9DBA-EF32DA7745AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CA595A0-5240-45A9-9DBA-EF32DA7745AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72925E4F-4579-4016-820B-2B58DDF6EC63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72925E4F-4579-4016-820B-2B58DDF6EC63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72925E4F-4579-4016-820B-2B58DDF6EC63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72925E4F-4579-4016-820B-2B58DDF6EC63}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

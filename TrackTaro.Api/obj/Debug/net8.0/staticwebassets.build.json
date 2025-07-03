@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "VNJdEwXja1KCuoqezYZAgGBEEmgMew6wndSLYNJM1FY=",
+  "Source": "TrackTaro.Api",
+  "BasePath": "_content/TrackTaro.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

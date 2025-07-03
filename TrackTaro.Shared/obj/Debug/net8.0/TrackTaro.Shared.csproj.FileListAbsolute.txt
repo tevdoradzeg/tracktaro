@@ -1,0 +1,11 @@
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/bin/Debug/net8.0/TrackTaro.Shared.deps.json
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/bin/Debug/net8.0/TrackTaro.Shared.dll
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/bin/Debug/net8.0/TrackTaro.Shared.pdb
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.AssemblyInfoInputs.cache
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.AssemblyInfo.cs
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.csproj.CoreCompileInputs.cache
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.dll
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/refint/TrackTaro.Shared.dll
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.pdb
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/ref/TrackTaro.Shared.dll
