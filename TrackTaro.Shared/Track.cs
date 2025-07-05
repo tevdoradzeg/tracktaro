@@ -14,6 +14,5 @@ public class Track
     public int DiscId { get; set; }
     public virtual Disc Disc { get; set; } = null!;
     public virtual ICollection<Artist> Artists { get; set; } = new List<Artist>();
-
     public override string ToString() => $"{Name} ({Duration})";
 }

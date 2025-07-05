@@ -36,9 +36,9 @@ public class Item
 }
 
 public class BookletImage
-    {
-        public int Id { get; set; }
-        public string ImagePath { get; set; } = string.Empty;
-        public int ItemId { get; set; }
-        public Item Item { get; set; } = null!;
-    }
+{
+    public int Id { get; set; }
+    public string ImagePath { get; set; } = string.Empty;
+    public int ItemId { get; set; }
+    public Item Item { get; set; } = null!;
+}
