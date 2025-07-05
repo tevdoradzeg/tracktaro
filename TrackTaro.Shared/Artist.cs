@@ -9,5 +9,12 @@ public class Artist
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    // Relations
+    public virtual ICollection<Item> Items { get; set; } = new List<Item>();
+    public virtual ICollection<Disc> Discs { get; set; } = new List<Disc>();
+    public virtual ICollection<Track> Tracks { get; set; } = new List<Track>();
+
+
+
     public override string ToString() => Name;
 }

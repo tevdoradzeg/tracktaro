@@ -1,4 +1,5 @@
 namespace TrackTaro.Shared;
+using System.ComponentModel.DataAnnotations;
 
 public enum ItemType
 {
@@ -20,16 +21,24 @@ public class Item
     public string Label { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public Disc[] Discs { get; set; } = Array.Empty<Disc>();
-    public Artist[] Artists { get; set; } = Array.Empty<Artist>();
-    public ItemImages Images { get; set; } = new ItemImages();
     public ItemType Type { get; set; } = ItemType.Album;
+
+    // Image management for the item
+    public string CoverImagePath { get; set; } = string.Empty;
+    public string BackImagePath { get; set; } = string.Empty;
+
+    // Relations
+    public virtual ICollection<Disc> Discs { get; set; } = new List<Disc>();
+    public virtual ICollection<Artist> Artists { get; set; } = new List<Artist>();
+    public virtual ICollection<BookletImage> BookletImages { get; set; } = new List<BookletImage>();
+
     public override string ToString() => $"{Name} - {Description}";
 }
 
-public class ItemImages
-{
-    public string CoverImagePath { get; set; } = string.Empty;
-    public string BackImagePath { get; set; } = string.Empty;
-    public string[] BookletImagePaths { get; set; } = Array.Empty<string>();
-}
+public class BookletImage
+    {
+        public int Id { get; set; }
+        public string ImagePath { get; set; } = string.Empty;
+        public int ItemId { get; set; }
+        public Item Item { get; set; } = null!;
+    }
