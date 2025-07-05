@@ -31,3 +31,4 @@
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Web/bin/Debug/net8.0/TrackTaro.Shared.pdb
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Web/obj/Debug/net8.0/TrackTaro.Web.csproj.AssemblyReference.cache
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Web/obj/Debug/net8.0/TrackTar.215F7F8E.Up2Date
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Web/obj/Debug/net8.0/TrackTaro.Web.sourcelink.json

@@ -9,3 +9,4 @@
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/refint/TrackTaro.Shared.dll
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.pdb
 /Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/ref/TrackTaro.Shared.dll
+/Users/giorgi/MusicVault/tracktaro/TrackTaro.Shared/obj/Debug/net8.0/TrackTaro.Shared.sourcelink.json

@@ -6,13 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient("TrackTaro.Api", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/api/");
+    client.BaseAddress = new Uri("https://https://localhost:7080/api/");
 });
 
 builder.Services.AddDbContext<MusicDbContext>(options => 

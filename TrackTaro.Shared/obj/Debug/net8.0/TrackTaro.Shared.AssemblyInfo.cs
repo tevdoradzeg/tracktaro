@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TrackTaro.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bcce5530c07a35c744658de19d067f72988dbb8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("TrackTaro.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TrackTaro.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
