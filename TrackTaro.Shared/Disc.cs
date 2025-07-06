@@ -9,7 +9,7 @@ public enum DiscType
 public abstract class Disc
 {
     public int Id { get; set; }
-    public abstract DiscType Type { get; }
+    public DiscType Type { get; protected set; } 
     public int Number { get; set; } = 1;
     public string DiscImagePath { get; set; } = string.Empty;
     public int ItemId { get; set; }
@@ -24,10 +24,16 @@ public abstract class Disc
 
 public class CDDisc : Disc
 {
-    override public DiscType Type => DiscType.CD;
+    public CDDisc()
+    {
+        Type = DiscType.CD;
+    }
 }
 
 public class VinylDisc : Disc
 {
-    override public DiscType Type => DiscType.Vinyl;
+    public VinylDisc()
+    {
+        Type = DiscType.Vinyl;
+    }
 }
