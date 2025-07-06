@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TrackTaro.Api.Migrations
 {
     [DbContext(typeof(MusicDbContext))]
-    [Migration("20250705150641_InitialCreate")]
+    [Migration("20250706193255_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,21 +34,6 @@ namespace TrackTaro.Api.Migrations
                     b.ToTable("DiscArtists", (string)null);
                 });
 
-            modelBuilder.Entity("ArtistItem", b =>
-                {
-                    b.Property<int>("ArtistsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ArtistsId", "ItemsId");
-
-                    b.HasIndex("ItemsId");
-
-                    b.ToTable("ItemArtists", (string)null);
-                });
-
             modelBuilder.Entity("ArtistTrack", b =>
                 {
                     b.Property<int>("ArtistsId")
@@ -62,6 +47,28 @@ namespace TrackTaro.Api.Migrations
                     b.HasIndex("TracksId");
 
                     b.ToTable("TrackArtists", (string)null);
+                });
+
+            modelBuilder.Entity("ItemArtist", b =>
+                {
+                    b.Property<int>("ArtistsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ArtistsId", "ItemsId");
+
+                    b.HasIndex("ItemsId");
+
+                    b.ToTable("ItemArtists", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ArtistsId = -1,
+                            ItemsId = -1
+                        });
                 });
 
             modelBuilder.Entity("Member", b =>
@@ -117,6 +124,118 @@ namespace TrackTaro.Api.Migrations
                     b.HasIndex("DiscId");
 
                     b.ToTable("Tracks");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 5, 43, 0),
+                            Name = "Birds of Fire",
+                            TrackNumber = 1,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -2,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 4, 39, 0),
+                            Name = "Miles Beyond",
+                            TrackNumber = 2,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -3,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 2, 54, 0),
+                            Name = "Celestial Terrestrial Commuters",
+                            TrackNumber = 3,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -4,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 0, 22, 0),
+                            Name = "Sapphire Bullets of Pure Love",
+                            TrackNumber = 4,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -5,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 3, 20, 0),
+                            Name = "Thousand Islad Park",
+                            TrackNumber = 5,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -6,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 1, 57, 0),
+                            Name = "Hope",
+                            TrackNumber = 6,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -7,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 9, 55, 0),
+                            Name = "One Word",
+                            TrackNumber = 7,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -8,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 5, 2, 0),
+                            Name = "Sanctuary",
+                            TrackNumber = 8,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -9,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 3, 54, 0),
+                            Name = "Open Country Joy",
+                            TrackNumber = 9,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = -10,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscId = -1,
+                            DiscNumber = 1,
+                            Duration = new TimeSpan(0, 0, 2, 10, 0),
+                            Name = "Resolution",
+                            TrackNumber = 10,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.Artist", b =>
@@ -146,6 +265,17 @@ namespace TrackTaro.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Artists");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            Country = "United States",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Members = "[]",
+                            Name = "Mahavishnu Orchestra",
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.BookletImage", b =>
@@ -249,6 +379,22 @@ namespace TrackTaro.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Items");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            BackImagePath = "",
+                            CoverImagePath = "",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "As with the group's previous album, The Inner Mounting Flame, Birds of Fire consists solely of compositions by John McLaughlin. These include the track \"Miles Beyond (Miles Davis)\", which McLaughlin dedicated to his friend and former bandleader.",
+                            Label = "",
+                            Name = "Birds of Fire",
+                            Publisher = "",
+                            Type = 0,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Year = 1973
+                        });
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.CDDisc", b =>
@@ -256,6 +402,18 @@ namespace TrackTaro.Api.Migrations
                     b.HasBaseType("TrackTaro.Shared.Disc");
 
                     b.HasDiscriminator().HasValue(0);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = -1,
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscImagePath = "/fakepath.png",
+                            ItemId = -1,
+                            Number = 1,
+                            Type = 0,
+                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.VinylDisc", b =>
@@ -280,21 +438,6 @@ namespace TrackTaro.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ArtistItem", b =>
-                {
-                    b.HasOne("TrackTaro.Shared.Artist", null)
-                        .WithMany()
-                        .HasForeignKey("ArtistsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TrackTaro.Shared.Item", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ArtistTrack", b =>
                 {
                     b.HasOne("TrackTaro.Shared.Artist", null)
@@ -306,6 +449,21 @@ namespace TrackTaro.Api.Migrations
                     b.HasOne("Track", null)
                         .WithMany()
                         .HasForeignKey("TracksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ItemArtist", b =>
+                {
+                    b.HasOne("TrackTaro.Shared.Artist", null)
+                        .WithMany()
+                        .HasForeignKey("ArtistsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TrackTaro.Shared.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

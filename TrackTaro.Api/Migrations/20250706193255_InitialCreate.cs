@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace TrackTaro.Api.Migrations
 {
     /// <inheritdoc />
@@ -209,6 +211,43 @@ namespace TrackTaro.Api.Migrations
                         principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Artists",
+                columns: new[] { "Id", "Country", "CreatedAt", "Members", "Name", "UpdatedAt" },
+                values: new object[] { -1, "United States", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "[]", "Mahavishnu Orchestra", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+
+            migrationBuilder.InsertData(
+                table: "Items",
+                columns: new[] { "Id", "BackImagePath", "CoverImagePath", "CreatedAt", "Description", "Label", "Name", "Publisher", "Type", "UpdatedAt", "Year" },
+                values: new object[] { -1, "", "", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "As with the group's previous album, The Inner Mounting Flame, Birds of Fire consists solely of compositions by John McLaughlin. These include the track \"Miles Beyond (Miles Davis)\", which McLaughlin dedicated to his friend and former bandleader.", "", "Birds of Fire", "", 0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1973 });
+
+            migrationBuilder.InsertData(
+                table: "Discs",
+                columns: new[] { "Id", "CreatedAt", "DiscImagePath", "ItemId", "Number", "Type", "UpdatedAt" },
+                values: new object[] { -1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "/fakepath.png", -1, 1, 0, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+
+            migrationBuilder.InsertData(
+                table: "ItemArtists",
+                columns: new[] { "ArtistsId", "ItemsId" },
+                values: new object[] { -1, -1 });
+
+            migrationBuilder.InsertData(
+                table: "Tracks",
+                columns: new[] { "Id", "CreatedAt", "DiscId", "DiscNumber", "Duration", "Name", "TrackNumber", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { -10, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 2, 10, 0), "Resolution", 10, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -9, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 3, 54, 0), "Open Country Joy", 9, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -8, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 5, 2, 0), "Sanctuary", 8, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -7, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 9, 55, 0), "One Word", 7, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -6, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 1, 57, 0), "Hope", 6, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -5, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 3, 20, 0), "Thousand Islad Park", 5, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -4, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 0, 22, 0), "Sapphire Bullets of Pure Love", 4, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -3, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 2, 54, 0), "Celestial Terrestrial Commuters", 3, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 4, 39, 0), "Miles Beyond", 2, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { -1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), -1, 1, new TimeSpan(0, 0, 5, 43, 0), "Birds of Fire", 1, new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.CreateIndex(
