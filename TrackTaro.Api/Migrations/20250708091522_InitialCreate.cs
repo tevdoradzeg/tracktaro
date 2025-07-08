@@ -21,7 +21,6 @@ namespace TrackTaro.Api.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Country = table.Column<string>(type: "TEXT", nullable: false),
-                    Members = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -215,8 +214,8 @@ namespace TrackTaro.Api.Migrations
 
             migrationBuilder.InsertData(
                 table: "Artists",
-                columns: new[] { "Id", "Country", "CreatedAt", "Members", "Name", "UpdatedAt" },
-                values: new object[] { -1, "United States", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "[]", "Mahavishnu Orchestra", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
+                columns: new[] { "Id", "Country", "CreatedAt", "Name", "UpdatedAt" },
+                values: new object[] { -1, "United States", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Mahavishnu Orchestra", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 table: "Items",

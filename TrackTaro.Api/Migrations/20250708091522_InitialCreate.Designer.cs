@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TrackTaro.Api.Migrations
 {
     [DbContext(typeof(MusicDbContext))]
-    [Migration("20250706193318_AddInitialTestData")]
-    partial class AddInitialTestData
+    [Migration("20250708091522_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -251,10 +251,6 @@ namespace TrackTaro.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.PrimitiveCollection<string>("Members")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -272,7 +268,6 @@ namespace TrackTaro.Api.Migrations
                             Id = -1,
                             Country = "United States",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Members = "[]",
                             Name = "Mahavishnu Orchestra",
                             UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -471,7 +466,7 @@ namespace TrackTaro.Api.Migrations
             modelBuilder.Entity("Member", b =>
                 {
                     b.HasOne("TrackTaro.Shared.Artist", "Artist")
-                        .WithMany()
+                        .WithMany("Members")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -510,6 +505,11 @@ namespace TrackTaro.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("TrackTaro.Shared.Artist", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.Disc", b =>
