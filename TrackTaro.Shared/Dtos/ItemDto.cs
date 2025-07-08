@@ -11,6 +11,7 @@ public class ItemDto
     public ItemType Type { get; set; }
     public string CoverImagePath { get; set; } = string.Empty;
     public string BackImagePath { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<ArtistDto> Artists { get; set; } = new List<ArtistDto>();
     public ICollection<DiscDto> Discs { get; set; } = new List<DiscDto>();
     public ICollection<BookletImageDto> BookletImages { get; set; } = new List<BookletImageDto>();

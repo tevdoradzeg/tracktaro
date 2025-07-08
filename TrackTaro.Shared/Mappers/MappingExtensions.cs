@@ -72,6 +72,7 @@ public static class MappingExtensions
             Type = item.Type,
             CoverImagePath = item.CoverImagePath,
             BackImagePath = item.BackImagePath,
+            CreatedAt = item.CreatedAt,
             Artists = item.Artists.Select(a => a.ToDto()).ToList(),
             Discs = item.Discs.Select(d => d.ToDto()).ToList(),
             BookletImages = item.BookletImages.Select(bI => bI.ToDto()).ToList()
