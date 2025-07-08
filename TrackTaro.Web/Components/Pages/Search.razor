@@ -1,0 +1,134 @@
+@page "/search"
+@rendermode InteractiveServer
+@inject HttpClient Http
+@using System.Text.Json
+@using TrackTaro.Shared.Dtos
+
+<PageTitle>Search | TrackTaro</PageTitle>
+
+<div class="search-page container mt-5 ml-5">
+    <h1>Search the Collection</h1>
+
+    @* Loosely inspired by https://getbootstrap.com/docs/5.0/forms/input-group/#buttons-with-dropdowns*@
+    <div class="input-group mb-4">
+        @* Dropdown for selecting search property *@
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" @onclick="ToggleDropdown">
+            @selectedSearchProperty
+        </button>
+        
+        <ul class="dropdown-menu @(isDropdownVisible ? "show" : "")">
+            @foreach (var prop in searchProperties)
+            {
+                <li>
+                    <button type="button" class="dropdown-item" @onclick="() => SelectSearchProperty(prop)">
+                        @prop
+                    </button>
+                </li>
+            }
+        </ul>
+
+        <input type="text" class="form-control" placeholder="Enter search term..." @oninput="HandleSearchInput" />
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    else if (items != null && items.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in items)
+            {
+                <div class="col">
+                    <ItemCard Item="item" />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+
+@code {
+    private List<string> searchProperties = new() { "Item Name", "Artist Name" };
+    private string selectedSearchProperty = "Item Name";
+    private string searchTerm = string.Empty;
+    private bool isDropdownVisible = false;
+
+    private List<ItemDto>? items;
+    private bool isLoading = false;
+    private string? errorMessage;
+
+    private async Task HandleSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+
+        // If the search term is empty, clear the results immediately and stop.
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            items = new List<ItemDto>(); // Clear the list
+            isLoading = false;
+            errorMessage = null;
+            StateHasChanged(); // Ensure the UI updates
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+        items = new List<ItemDto>();
+        StateHasChanged(); // Update to show the spinner (took me a while to figure this out)
+
+        try
+        {
+            var queryParamName = selectedSearchProperty == "Item Name" ? "name" : "artistName";
+            var requestUri = $"api/items?{queryParamName}={Uri.EscapeDataString(searchTerm)}";
+
+            var response = await Http.GetAsync(requestUri);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                items = JsonSerializer.Deserialize<List<ItemDto>>(json, options);
+            }
+            else
+            {
+                errorMessage = $"Error fetching data: {response.ReasonPhrase}";
+                items = new(); // Clear previous results
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An unexpected error occurred: {ex.Message}";
+            items = new();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged(); // Search is finished, update
+        }
+    }
+
+    private void ToggleDropdown()
+    {
+        isDropdownVisible = !isDropdownVisible;
+    }
+
+    private void SelectSearchProperty(string property)
+    {
+        selectedSearchProperty = property;
+        isDropdownVisible = false;
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            _ = HandleSearchInput(new ChangeEventArgs());
+        }
+    }
+}
