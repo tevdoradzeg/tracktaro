@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrackTaro.Shared;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using TrackTaro.Api.Authentication;
 using TrackTaro.Shared.Mappers;
 
 namespace TrackTaro.Api.Controllers;
@@ -20,6 +19,7 @@ public class ItemsController : ControllerBase
 
     // GET: api/items
     [HttpGet]
+    [ApiKey]
     public async Task<ActionResult<IEnumerable<Item>>> GetItems(
         [FromQuery] string? name,
         [FromQuery] string? timeAcquired,
@@ -34,7 +34,7 @@ public class ItemsController : ControllerBase
         {
             query = query.Where(item => item.Name.ToLower().Contains(name.ToLower()));
         }
-        
+
         // A more verbose filter to filter items by time acquired
         if (!string.IsNullOrWhiteSpace(timeAcquired))
         {
