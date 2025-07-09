@@ -19,7 +19,7 @@ public class ItemsController : ControllerBase
 
     // GET: api/items
     [HttpGet]
-    [ApiKey]
+    // [ApiKey]
     public async Task<ActionResult<IEnumerable<Item>>> GetItems(
         [FromQuery] string? name,
         [FromQuery] string? timeAcquired,

@@ -1,11 +1,21 @@
 @using TrackTaro.Shared.Dtos;
 
 <div class="card h-100 shadow-sm">
+
+    @if (!string.IsNullOrEmpty(Item.CoverImagePath))
+    {
+        <div class="card-img-top text-center">
+            <img src="@Item.CoverImagePath" class="card-img-top center-block" alt="cover image for @Item.Name"
+                style="width: 100%; height: auto; object-fit: cover;"
+                onerror="this.onerror=null;this.screen='images/cover_error.png'"/>
+        </div>
+    }
+
     <div class="card-body d-flex flex-column">
         <h5 class="card-title">@Item.Name</h5>
         <h6 class="card-subtitle mb-2 text-muted">@string.Join(", ", Item.Artists.Select(a => a.Name)) (@Item.Year)</h6>
         <p class="card-text flex-grow-1">@Item.Description</p>
-        <a href="/" class="btn btn-primary mt-auto">Full</a>
+        <a href="/" class="btn btn-primary mt-auto">View Item</a>
     </div>
 </div>
 

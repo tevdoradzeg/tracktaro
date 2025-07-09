@@ -67,7 +67,10 @@ public class MusicDbContext : DbContext
         );
 
         modelBuilder.Entity<Item>().HasData(
-            new Item { Id = -1, Name = "Birds of Fire", Year = 1973, Type = ItemType.Album, Description = "As with the group's previous album, The Inner Mounting Flame, Birds of Fire consists solely of compositions by John McLaughlin. These include the track \"Miles Beyond (Miles Davis)\", which McLaughlin dedicated to his friend and former bandleader.", CreatedAt = seedDate, UpdatedAt = seedDate } // Descritpion sourced from Wikipedia
+            new Item { Id = -1, Name = "Birds of Fire", Year = 1973, Type = ItemType.Album,
+                CoverImagePath = "/images/covers/birds_of_fire.jpg",
+                BackImagePath = "/images/covers/birds_of_fire_back.jpg",
+                Description = "As with the group's previous album, The Inner Mounting Flame, Birds of Fire consists solely of compositions by John McLaughlin. These include the track \"Miles Beyond (Miles Davis)\", which McLaughlin dedicated to his friend and former bandleader.", CreatedAt = seedDate, UpdatedAt = seedDate } // Descritpion sourced from Wikipedia
         );
 
         modelBuilder.Entity<CDDisc>().HasData(
