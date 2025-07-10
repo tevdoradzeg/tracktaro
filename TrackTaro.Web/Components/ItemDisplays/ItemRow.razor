@@ -1,0 +1,17 @@
+@using TrackTaro.Shared.Dtos;
+
+<li class="list-group-item d-flex justify-content-between align-items-center">
+    <span>
+        <h5 class="card-title">@Item.Name</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Item.Year</h6>
+    </span>
+    <span>
+        <a href="/item/@Item.Id" class="btn btn-primary mt-auto">View Item</a>
+    </span>
+</li>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public ItemMinimalDto Item { get; set; } = null!;
+}

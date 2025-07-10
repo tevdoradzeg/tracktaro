@@ -26,7 +26,12 @@
     <hr/>
     <div class="col-md-8">
         <h1>@Item.Name</h1>
-        <h3>@string.Join(", ", Item.Artists.Select(a => a.Name))</h3>
+        <h3>
+            @foreach (var artist in Item.Artists)
+            {
+                <a href="artist/@artist.Id" class="text-dark text-decoration-none">@artist.Name</a>
+            }
+        </h3>
         <h5 class="text-muted">@Item.Type.ToString()</h5>
         <h5 class="text-muted">@Item.Year</h5>
         <h5 class="text-muted">Added to the Collection - @Item.CreatedAt.ToString(@"yyyy MMM d")</h5>

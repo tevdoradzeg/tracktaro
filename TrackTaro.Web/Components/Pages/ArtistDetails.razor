@@ -1,0 +1,91 @@
+@page "/artist/{Id:int}"
+@inject HttpClient Http
+@using TrackTaro.Shared.Dtos
+@using System.Text.Json
+
+<PageTitle>@_artist?.Name | TrackTaro</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger mt-5" role="alert">@_error</div>
+} else if (_artist != null)
+{
+    <div class="container mt-4">
+        <h1>@_artist.Name</h1>
+        <h3 class="text-muted">@_artist.Country</h3>
+        
+        @if (_artist.Members != null && _artist.Members.Any())
+        {
+            <h5 class="text-muted">Members</h5>
+            <ul class="list-group list-group-flush text-muted">
+                @foreach (var member in _artist.Members)
+                {
+                    <li class="list-group-item">
+                        <span>@member.Name</span>
+                    </li>
+                }
+            </ul>
+        }
+
+        <br/>
+        <h5 class="text-muted">Items</h5>
+        <ul class="list-group list-group-flush">
+        @foreach (var item in _artist.Items)
+        {
+            <ItemRow Item="@item"/>
+        }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mt-5" role="alert">
+        Artist not found.
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ArtistDto? _artist;
+    private bool _isLoading = true;
+    private string? _error;
+
+    // When the page gets created
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch the artist details from the API
+            var response = await Http.GetAsync($"api/artists/{Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _artist = JsonSerializer.Deserialize<ArtistDto>(
+                    json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            else
+            {
+                _error = "Artist not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

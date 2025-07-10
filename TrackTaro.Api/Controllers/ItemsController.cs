@@ -107,7 +107,7 @@ public class ItemsController : ControllerBase
     {
         if (itemDto == null) { return BadRequest("Item data is required."); } // 400 Bad Request if item data is null
 
-        // Artist object
+        // Item object
         Item newItem = new Item
         {
             Name = itemDto.Name,

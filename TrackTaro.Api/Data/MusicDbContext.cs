@@ -66,6 +66,12 @@ public class MusicDbContext : DbContext
             new Artist { Id = -1, Name = "Mahavishnu Orchestra", Country = "United States", CreatedAt = seedDate, UpdatedAt = seedDate }
         );
 
+        modelBuilder.Entity<Member>().HasData(
+            new Member { Id = -1, Name = "John McLaughlin", ArtistId = -1 },
+            new Member { Id = -2, Name = "Rick Laird", ArtistId = -1 },
+            new Member { Id = -3, Name = "Billy Cobham", ArtistId = -1 }
+        );
+
         modelBuilder.Entity<Item>().HasData(
             new Item { Id = -1, Name = "Birds of Fire", Year = 1973, Type = ItemType.Album,
                 CoverImagePath = "/uploads/covers/birds_of_fire.jpg",

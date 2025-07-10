@@ -9,16 +9,16 @@ namespace TrackTaro.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ArtistController : ControllerBase
+public class ArtistsController : ControllerBase
 {
     private readonly MusicDbContext _context;
 
-    public ArtistController(MusicDbContext context)
+    public ArtistsController(MusicDbContext context)
     {
         _context = context;
     }
 
-    // GET: api/artist
+    // GET: api/artists
     // Endpoint for searching with parameters
     [HttpGet]
     // [ApiKey]
@@ -51,9 +51,27 @@ public class ArtistController : ControllerBase
 
         var artistsDb = await query
             .Include(artist => artist.Items)
+            .Include(artist => artist.Members)
             .ToListAsync();
 
         var artists = artistsDb.Select(artist => artist.ToDto()).ToList();
         return Ok(artists); // Return a 200 OK response with the list of artists
+    }
+
+    // GET: api/artists/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ArtistDto>> GetArtist(int id)
+    {
+        var artist = await _context.Artists
+            .Include(a => a.Items)
+            .Include(a => a.Members)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (artist == null)
+        {
+            return NotFound(); // Return 404 Not Found if the artist does not exist
+        }
+
+        return Ok(artist.ToDto()); // Return the artist details as DTO
     }
 }
