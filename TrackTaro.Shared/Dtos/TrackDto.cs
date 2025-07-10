@@ -7,3 +7,10 @@ public class TrackDto
     public TimeSpan Duration { get; set; }
     public int TrackNumber { get; set; }
 }
+
+public class CreateTrackDto
+{
+    public string Name { get; set; } = string.Empty;
+    public TimeSpan Duration { get; set; }
+    public int TrackNumber { get; set; }
+}

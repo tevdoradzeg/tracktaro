@@ -68,17 +68,17 @@ public class MusicDbContext : DbContext
 
         modelBuilder.Entity<Item>().HasData(
             new Item { Id = -1, Name = "Birds of Fire", Year = 1973, Type = ItemType.Album,
-                CoverImagePath = "/images/covers/birds_of_fire.jpg",
-                BackImagePath = "/images/covers/birds_of_fire_back.jpg",
+                CoverImagePath = "/uploads/covers/birds_of_fire.jpg",
+                BackImagePath = "/uploads/backs/birds_of_fire_back.jpg",
                 Description = "As with the group's previous album, The Inner Mounting Flame, Birds of Fire consists solely of compositions by John McLaughlin. These include the track \"Miles Beyond (Miles Davis)\", which McLaughlin dedicated to his friend and former bandleader.", CreatedAt = seedDate, UpdatedAt = seedDate } // Descritpion sourced from Wikipedia
         );
 
         modelBuilder.Entity<BookletImage>().HasData(
-            new BookletImage { Id = -1, ItemId = -1, ImagePath = "/images/booklets/birds_of_fire_booklet1.jpg"}
+            new BookletImage { Id = -1, ItemId = -1, ImagePath = "/uploads/booklets/birds_of_fire_booklet1.jpg"}
         );
 
         modelBuilder.Entity<CDDisc>().HasData(
-            new CDDisc { Id = -1, ItemId = -1, Number = 1, DiscImagePath = "/images/discs/birds_of_fire_disc1.png", CreatedAt = seedDate, UpdatedAt = seedDate }
+            new CDDisc { Id = -1, ItemId = -1, Number = 1, DiscImagePath = "/uploads/discs/birds_of_fire_disc1.png", CreatedAt = seedDate, UpdatedAt = seedDate }
         );
 
         modelBuilder.Entity<Track>().HasData(

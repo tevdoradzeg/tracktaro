@@ -30,6 +30,21 @@ public class ItemShortDto
     public ICollection<ArtistDto> Artists { get; set; } = new List<ArtistDto>();
 }
 
+public class CreateItemDto
+{
+    public int Year { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
+    public string Lable { get; set; } = string.Empty;
+    public ItemType Type { get; set; }
+    public string CoverImagePath { get; set; } = string.Empty;
+    public string BackImagePath { get; set; } = string.Empty;
+    public List<CreateDiscDto> Discs { get; set; } = new();
+    // since dto would only contain path use string instead
+    public List<string> BookletImagePaths { get; set; } = new();
+}
+
 public class BookletImageDto
 {
     public int Id { get; set; }

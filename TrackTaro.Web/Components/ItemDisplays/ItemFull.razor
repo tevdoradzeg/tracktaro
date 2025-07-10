@@ -1,3 +1,4 @@
+@inject HttpClient Http
 @using TrackTaro.Shared.Dtos;
 
 <div class="container mt-4">
@@ -6,7 +7,7 @@
         @if (!string.IsNullOrWhiteSpace(Item.CoverImagePath))
         {
             <div class="col-md-5">
-                <img src="@Item.CoverImagePath" class="img-fluid rounded shadow-lg" alt="cover image for @Item.Name"
+                <img src="@(new Uri(Http.BaseAddress!, Item.CoverImagePath))" class="img-fluid rounded shadow-lg" alt="cover image for @Item.Name"
                     style="width: 100%; height: auto; object-fit: cover;"
                     onerror="this.onerror=null;this.screen='images/cover_error.png'"/>
             </div>
@@ -14,7 +15,7 @@
         @if (!string.IsNullOrWhiteSpace(Item.BackImagePath))
         {
             <div class="col-md-5">
-                <img src="@Item.BackImagePath" class="img-fluid rounded shadow-lg" alt="back image for @Item.Name"
+                <img src="@(new Uri(Http.BaseAddress!, Item.BackImagePath))" class="img-fluid rounded shadow-lg" alt="back image for @Item.Name"
                     style="width: 100%; height: auto; object-fit: cover;"
                     onerror="this.onerror=null;this.screen='images/cover_error.png'"/>
             </div>
@@ -43,7 +44,7 @@
         <h5>Disc @disc.Number</h5>
         <div class="row mb-5 align-items-start">
             <div class="col-md-5">
-                <img src="@disc.DiscImagePath" class="img-fluid" alt="disc image for disc @disc.Number"
+                <img src="@(new Uri(Http.BaseAddress!, disc.DiscImagePath))" class="img-fluid" alt="disc image for disc @disc.Number"
                     onerror="this.onerror=null;this.screen='images/cover_error.png'"/>
             </div>
             <div class="col-md-7">
@@ -69,7 +70,7 @@
             @foreach (var bookletImage in Item.BookletImages) 
             {
                 <div class="col">
-                    <img src="@bookletImage.ImagePath" class="img-fluid rounded" alt="booklet image for @Item.Name"/>
+                    <img src="@(new Uri(Http.BaseAddress!, bookletImage.ImagePath))" class="img-fluid rounded" alt="booklet image for @Item.Name"/>
                 </div>
             }
         </div>

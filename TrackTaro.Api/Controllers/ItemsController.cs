@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TrackTaro.Shared;
-using TrackTaro.Api.Authentication;
 using TrackTaro.Shared.Mappers;
 using TrackTaro.Shared.Dtos;
+using TrackTaro.Shared;
 
 namespace TrackTaro.Api.Controllers;
 
@@ -22,14 +21,14 @@ public class ItemsController : ControllerBase
     // Endpoint for searching with parameters
     [HttpGet]
     // [ApiKey]
-    public async Task<ActionResult<IEnumerable<Item>>> GetItems(
+    public async Task<ActionResult<IEnumerable<ItemShortDto>>> GetItems(
         [FromQuery] string? name,
         [FromQuery] string? timeAcquired,
         [FromQuery] string? artistName
     )
     {
         // Build the query
-        var query = _context.Items.AsQueryable();
+        IQueryable<Item> query = _context.Items.AsQueryable();
 
         // Apply filter base on item name
         if (!string.IsNullOrWhiteSpace(name))
@@ -40,7 +39,7 @@ public class ItemsController : ControllerBase
         // A more verbose filter to filter items by time acquired
         if (!string.IsNullOrWhiteSpace(timeAcquired))
         {
-            var cutOff = DateTime.UtcNow;
+            DateTime cutOff = DateTime.UtcNow;
             bool dateFilterValid = true;
 
             switch (timeAcquired.ToLower())
@@ -88,7 +87,7 @@ public class ItemsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ItemDto>> GetItem(int id)
     {
-        var item = await _context.Items
+        Item? item = await _context.Items
             .Include(i => i.Artists)
             .Include(i => i.Discs)
                 .ThenInclude(d => d.Tracks)
@@ -98,5 +97,75 @@ public class ItemsController : ControllerBase
         if (item == null) { return NotFound(); } // 404 Not Found if item does not exist
 
         return Ok(item.ToDto()); // 200 OK response with item details
+    }
+
+    // POST: api/items
+    // Endpoint for creating a new item
+    [HttpPost]
+    public async Task<ActionResult<ItemDto>> CreateItem([FromBody] CreateItemDto itemDto)
+    {
+        if (itemDto == null) { return BadRequest("Item data is required."); } // 400 Bad Request if item data is null
+
+        // Artist object
+        Item newItem = new Item
+        {
+            Name = itemDto.Name,
+            Year = itemDto.Year,
+            Description = itemDto.Description,
+            Publisher = itemDto.Publisher,
+            Label = itemDto.Lable,
+            Type = itemDto.Type,
+            CoverImagePath = itemDto.CoverImagePath,
+            BackImagePath = itemDto.BackImagePath,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            BookletImages = itemDto.BookletImagePaths
+                .Select(path => new BookletImage { ImagePath = path })
+                .ToList()
+        };
+
+        // Disc objects
+        foreach (CreateDiscDto discDto in itemDto.Discs)
+        {
+            if (discDto.Type == DiscType.CD)
+            {
+                newItem.Discs.Add(new CDDisc
+                {
+                    Number = discDto.Number,
+                    DiscImagePath = discDto.DiscImagePath,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Tracks = discDto.Tracks.Select(trackDto => new Track
+                    {
+                        Name = trackDto.Name,
+                        Duration = trackDto.Duration,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                    }).ToList()
+                });
+            }
+            else if (discDto.Type == DiscType.Vinyl)
+            {
+                newItem.Discs.Add(new VinylDisc
+                {
+                    Number = discDto.Number,
+                    DiscImagePath = discDto.DiscImagePath,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Tracks = discDto.Tracks.Select(trackDto => new Track
+                    {
+                        Name = trackDto.Name,
+                        Duration = trackDto.Duration,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                    }).ToList()
+                });
+            }
+        }
+
+        _context.Items.Add(newItem);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetItem), new { id = newItem.Id }, newItem.ToDto()); // 201 Created response with the created item
     }
 }

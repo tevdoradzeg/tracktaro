@@ -1,3 +1,4 @@
+@inject HttpClient Http
 @using TrackTaro.Shared.Dtos;
 
 <div class="card h-100 shadow-sm">
@@ -5,7 +6,7 @@
     @if (!string.IsNullOrEmpty(Item.CoverImagePath))
     {
         <div class="card-img-top text-center">
-            <img src="@Item.CoverImagePath" class="card-img-top center-block" alt="cover image for @Item.Name"
+            <img src="@(new Uri(Http.BaseAddress!, Item.CoverImagePath))" class="card-img-top center-block" alt="cover image for @Item.Name"
                 style="width: 100%; height: auto; object-fit: cover;"
                 onerror="this.onerror=null;this.screen='images/cover_error.png'"/>
         </div>
