@@ -15,11 +15,11 @@
         <h5 class="card-title">@Item.Name</h5>
         <h6 class="card-subtitle mb-2 text-muted">@string.Join(", ", Item.Artists.Select(a => a.Name)) (@Item.Year)</h6>
         <p class="card-text flex-grow-1">@Item.Description</p>
-        <a href="/" class="btn btn-primary mt-auto">View Item</a>
+        <a href="/item/@Item.Id" class="btn btn-primary mt-auto">View Item</a>
     </div>
 </div>
 
 @code {
     [Parameter, EditorRequired]
-    public ItemDto Item { get; set; } = null!;
+    public ItemShortDto Item { get; set; } = null!;
 }

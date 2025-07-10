@@ -1,0 +1,67 @@
+@page "/item/{Id:int}"
+@inject HttpClient Http
+@using TrackTaro.Shared.Dtos
+@using System.Text.Json
+
+<PageTitle>@_item?.Name | TrackTaro</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger mt-5" role="alert">@_error</div>
+}
+else if (_item != null)
+{
+    <ItemFull Item="_item"/>
+}
+else
+{
+    <div class="alert alert-warning mt-5" role="alert">
+        Item not found.
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ItemDto? _item;
+    private bool _isLoading = true;
+    private string? _error;
+
+    // When the page gets created
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch the item details from the API
+            var response = await Http.GetAsync($"api/items/{Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _item = JsonSerializer.Deserialize<ItemDto>(
+                    json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            else
+            {
+                _error = "Item not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

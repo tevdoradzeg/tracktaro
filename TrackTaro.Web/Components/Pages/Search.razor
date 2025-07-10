@@ -62,7 +62,7 @@
     private string searchTerm = string.Empty;
     private bool isDropdownVisible = false;
 
-    private List<ItemDto>? items;
+    private List<ItemShortDto>? items;
     private bool isLoading = false;
     private string? errorMessage;
 
@@ -73,7 +73,7 @@
         // If the search term is empty, clear the results immediately and stop.
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            items = new List<ItemDto>(); // Clear the list
+            items = new List<ItemShortDto>(); // Clear the list
             isLoading = false;
             errorMessage = null;
             StateHasChanged(); // Ensure the UI updates
@@ -82,7 +82,7 @@
 
         isLoading = true;
         errorMessage = null;
-        items = new List<ItemDto>();
+        items = new List<ItemShortDto>();
         StateHasChanged(); // Update to show the spinner (took me a while to figure this out)
 
         try
@@ -96,7 +96,7 @@
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                items = JsonSerializer.Deserialize<List<ItemDto>>(json, options);
+                items = JsonSerializer.Deserialize<List<ItemShortDto>>(json, options);
             }
             else
             {

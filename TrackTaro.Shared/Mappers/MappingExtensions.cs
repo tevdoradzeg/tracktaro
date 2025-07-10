@@ -78,4 +78,20 @@ public static class MappingExtensions
             BookletImages = item.BookletImages.Select(bI => bI.ToDto()).ToList()
         };
     }
+
+    public static ItemShortDto ToShortDto(this Item item)
+    {
+        return new ItemShortDto
+        {
+            Id = item.Id,
+            Year = item.Year,
+            Name = item.Name,
+            Description = item.Description,
+            Publisher = item.Publisher,
+            Label = item.Label,
+            Type = item.Type,
+            CoverImagePath = item.CoverImagePath,
+            Artists = item.Artists.Select(a => a.ToDto()).ToList()
+        };
+    }
 }

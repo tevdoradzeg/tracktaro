@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TrackTaro.Shared;
 using TrackTaro.Api.Authentication;
 using TrackTaro.Shared.Mappers;
+using TrackTaro.Shared.Dtos;
 
 namespace TrackTaro.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class ItemsController : ControllerBase
     }
 
     // GET: api/items
+    // Endpoint for searching with parameters
     [HttpGet]
     // [ApiKey]
     public async Task<ActionResult<IEnumerable<Item>>> GetItems(
@@ -73,14 +75,28 @@ public class ItemsController : ControllerBase
         // Get items from the database
         var itemsDb = await query
             .Include(item => item.Artists)
-            .Include(item => item.Discs)
-                .ThenInclude(disc => disc.Tracks)
-            .Include(item => item.BookletImages)
             .ToListAsync();
 
         // Make them readable, return only things to display / use on FE
-        var items = itemsDb.Select(item => item.ToDto()).ToList();
+        var items = itemsDb.Select(item => item.ToShortDto()).ToList();
 
         return Ok(items); // 200 OK response with items list
+    }
+
+    // GET: api/items/{id}
+    // Endpoint for getting a single item by ID
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ItemDto>> GetItem(int id)
+    {
+        var item = await _context.Items
+            .Include(i => i.Artists)
+            .Include(i => i.Discs)
+                .ThenInclude(d => d.Tracks)
+            .Include(i => i.BookletImages)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (item == null) { return NotFound(); } // 404 Not Found if item does not exist
+
+        return Ok(item.ToDto()); // 200 OK response with item details
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TrackTaro.Api.Migrations
 {
     [DbContext(typeof(MusicDbContext))]
-    partial class MusicDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250710104528_AddDiscImagePathTestData")]
+    partial class AddDiscImagePathTestData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -288,14 +291,6 @@ namespace TrackTaro.Api.Migrations
                     b.HasIndex("ItemId");
 
                     b.ToTable("BookletImages");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            ImagePath = "/images/booklets/birds_of_fire_booklet1.jpg",
-                            ItemId = -1
-                        });
                 });
 
             modelBuilder.Entity("TrackTaro.Shared.Disc", b =>
