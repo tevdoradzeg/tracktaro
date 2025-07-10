@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TrackTaro.Shared.Mappers;
 using TrackTaro.Shared.Dtos;
 using TrackTaro.Shared;
+using TrackTaro.Api.Authentication;
 
 namespace TrackTaro.Api.Controllers;
 
@@ -167,5 +168,31 @@ public class ItemsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetItem), new { id = newItem.Id }, newItem.ToDto()); // 201 Created response with the created item
+    }
+
+    // POST: api/items/{itemId}/artists
+    [HttpPost("{itemId}/artists")]
+    // [ApiKey]
+    public async Task<IActionResult> LinkArtistToItem(int itemId, [FromBody] ArtistToItemDto artistToItemDto)
+    {
+        Item? item = await _context.Items
+            .Include(i => i.Artists)
+            .FirstOrDefaultAsync(i => i.Id == itemId);
+
+        if (item == null) { return NotFound("Item not found."); } // 404 Not Found if item does not exist
+
+        Artist? artist = await _context.Artists
+            .FirstOrDefaultAsync(a => a.Id == artistToItemDto.AristId);
+        if (artist == null) { return NotFound("Artist not found."); } // 404 Not Found if artist does not exist
+
+        if (item.Artists.Any(a => a.Id == artist.Id))
+        {
+            return BadRequest("Artist is already linked to this item."); // 400 Bad Request if artist is already linked
+        }
+
+        item.Artists.Add(artist);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { Message = "Artist linked to item successfully." }); // 200 OK response
     }
 }

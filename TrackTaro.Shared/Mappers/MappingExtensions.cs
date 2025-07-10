@@ -33,6 +33,18 @@ public static class MappingExtensions
             Id = artist.Id,
             Name = artist.Name,
             Country = artist.Country,
+            Members = artist.Members.Select(m => m.ToDto()).ToList(),
+            Items = artist.Items.Select(i => i.ToMinimalDto()).ToList(),
+        };
+    }
+
+    public static ArtistShortDto ToShortDto(this Artist artist)
+    {
+        return new ArtistShortDto
+        {
+            Id = artist.Id,
+            Name = artist.Name,
+            Country = artist.Country,
             Members = artist.Members.Select(m => m.ToDto()).ToList()
         };
     }
@@ -45,7 +57,7 @@ public static class MappingExtensions
             DiscImagePath = disc.DiscImagePath,
             Number = disc.Number,
             Type = disc.Type,
-            Artists = disc.Artists.Select(a => a.ToDto()).ToList(),
+            Artists = disc.Artists.Select(a => a.ToShortDto()).ToList(),
             Tracks = disc.Tracks.Select(t => t.ToDto()).ToList()
         };
     }
@@ -73,7 +85,7 @@ public static class MappingExtensions
             CoverImagePath = item.CoverImagePath,
             BackImagePath = item.BackImagePath,
             CreatedAt = item.CreatedAt,
-            Artists = item.Artists.Select(a => a.ToDto()).ToList(),
+            Artists = item.Artists.Select(a => a.ToShortDto()).ToList(),
             Discs = item.Discs.Select(d => d.ToDto()).ToList(),
             BookletImages = item.BookletImages.Select(bI => bI.ToDto()).ToList()
         };
@@ -91,7 +103,20 @@ public static class MappingExtensions
             Label = item.Label,
             Type = item.Type,
             CoverImagePath = item.CoverImagePath,
-            Artists = item.Artists.Select(a => a.ToDto()).ToList()
+            Artists = item.Artists.Select(a => a.ToShortDto()).ToList()
+        };
+    }
+    
+    public static ItemMinimalDto ToMinimalDto(this Item item)
+    {
+        return new ItemMinimalDto
+        {
+            Id = item.Id,
+            Year = item.Year,
+            Name = item.Name,
+            Publisher = item.Publisher,
+            Label = item.Label,
+            Type = item.Type
         };
     }
 }

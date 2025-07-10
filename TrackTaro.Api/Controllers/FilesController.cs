@@ -1,8 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TrackTaro.Shared.Mappers;
-using TrackTaro.Shared.Dtos;
-using TrackTaro.Api.Authentication;
 using TrackTaro.Api.Helpers;
 
 namespace TrackTaro.Api.Controllers;
