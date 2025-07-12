@@ -1,0 +1,66 @@
+@page "/login"
+@rendermode InteractiveServer
+@inject AuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login | TrackTaro</PageTitle>
+
+<div class="login-page mt-5 ml-5">
+    <h3>Login for Giorgi (and only the most trusted friends)</h3>
+    @* Suggested component by gemini https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.forms.editform?view=aspnetcore-9.0 *@
+    <div class="card">
+        <div class="card-body">
+            <EditForm Model="@pModel" OnValidSubmit="HandleLogin">
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <InputText id="password" class="form-control" @bind-Value="pModel.Password" type="password" required/>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <div class="alert alert-danger">@_error</div>
+                }
+                <button type="submit" class="btn btn-primary" disabled="@_isLoading">
+                    @if (_isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    }
+                    Login
+                </button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string RedirectTo { get; set; } = "/add/item";
+
+    private class PasswordModel
+    {
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private PasswordModel pModel { get; set; } = new PasswordModel();
+    private string? _error;
+    private bool _isLoading;
+
+    private async Task HandleLogin()
+    {
+        _isLoading = true;
+        _error = null;
+
+        try
+        {
+            await AuthenticationService.LoginAsync(pModel.Password);
+            NavigationManager.NavigateTo(RedirectTo);
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

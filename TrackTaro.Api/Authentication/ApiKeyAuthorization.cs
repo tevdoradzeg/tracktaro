@@ -28,6 +28,6 @@ public class ApiKeyAttribute : Attribute, IAsyncAuthorizationFilter
             return;
         }
 
-        await Task.CompletedTask; // Simulate async operation
+        await Task.CompletedTask;
     }
 }

@@ -1,0 +1,42 @@
+@page "/add/item"
+@rendermode InteractiveServer
+@inject AuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+@* This ugly if else is in repsonse to the error of:
+InvalidOperationException: JavaScript interop calls cannot be issued at this time. This is because the component is being statically rendered. When prerendering is enabled, JavaScript interop calls can only be performed during the OnAfterRenderAsync lifecycle method.
+Basically the JSRuntime we use in auth service has to be called after the initial render (or so it seems)*@
+
+<div class="login-page mt-5 ml-5">
+    @if (_isCheckingAuth)
+    {
+        <p>Checking authentication...</p>
+    }
+    else
+    {
+        <h3>Add New Item</h3>
+    }
+
+</div>
+
+@code {
+    private bool _isCheckingAuth = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // This logic must run only on the client after the initial render.
+        if (firstRender)
+        {
+            var isAuthenticated = await AuthenticationService.IsAuthenticatedAsync();
+            if (!isAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                _isCheckingAuth = false;
+                StateHasChanged(); // Re-render the component to show the content
+            }
+        }
+    }
+}

@@ -1,3 +1,4 @@
+using TrackTaro.Web.AuthenticationService;
 using TrackTaro.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7080")
 });
+
+builder.Services.AddScoped<AuthenticationService>();
 
 var app = builder.Build();
 
