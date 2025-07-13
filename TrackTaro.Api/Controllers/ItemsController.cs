@@ -140,6 +140,7 @@ public class ItemsController : ControllerBase
                     {
                         Name = trackDto.Name,
                         Duration = trackDto.Duration,
+                        TrackNumber = trackDto.TrackNumber,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow,
                     }).ToList()

@@ -1,0 +1,91 @@
+@rendermode InteractiveServer 
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@using TrackTaro.Shared.Dtos
+
+<div class="mb-3">
+    <label class="form-label"><strong>Select Item Artists</strong></label>
+    
+    @if (SelectedArtists.Any())
+    {
+        <ul class="list-group mb-2">
+            @foreach (var artist in SelectedArtists)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    @artist.Name (@artist.Country)
+                    <button type="button" class="btn-close" aria-label="Remove" @onclick="() => DeselectArtist(artist)"></button>
+                </li>
+            }
+        </ul>
+    }
+
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for an artist..." @bind="_searchTerm" @oninput="OnSearchInput" />
+        <button class="btn btn-outline-secondary" type="button" @onclick="@(() => NavigationManager.NavigateTo("/add/artist"))">Create New Artist</button>
+    </div>
+
+    @if (_searchResults.Any())
+    {
+        <div class="list-group mt-1 position-relative">
+            <div class="list-group position-absolute w-100" style="z-index: 1000;">
+                 @foreach (var artist in _searchResults)
+                {
+                    <button type="button" class="list-group-item list-group-item-action" @onclick="() => SelectArtist(artist)">
+                        @artist.Name (@artist.Country)
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<ArtistDto> SelectedArtists { get; set; } = new();
+    
+    [Parameter]
+    public EventCallback<List<ArtistDto>> SelectedArtistsChanged { get; set; }
+
+    private string _searchTerm = string.Empty;
+    private List<ArtistDto> _searchResults = new();
+    private System.Threading.Timer? _timer;
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        _searchTerm = e.Value?.ToString() ?? string.Empty;
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            if (!string.IsNullOrWhiteSpace(_searchTerm))
+            {
+                var response = await HttpClient.GetAsync($"api/artists?name={_searchTerm}");
+                if (response.IsSuccessStatusCode)
+                {
+                    _searchResults = await response.Content.ReadFromJsonAsync<List<ArtistDto>>() ?? new();
+                    await InvokeAsync(StateHasChanged);
+                }
+            } else
+            {
+                _searchResults.Clear();
+                await InvokeAsync(StateHasChanged);
+            }
+        }, null, 300, Timeout.Infinite);
+    }
+
+    private async Task SelectArtist(ArtistDto artist)
+    {
+        if(!SelectedArtists.Any(a => a.Id == artist.Id))
+        {
+            SelectedArtists.Add(artist);
+            await SelectedArtistsChanged.InvokeAsync(SelectedArtists);
+        }
+        _searchTerm = string.Empty; // clear the search term
+        _searchResults.Clear(); // clear results
+    }
+
+    private async Task DeselectArtist(ArtistDto artist)
+    {
+        SelectedArtists.Remove(artist);
+        await SelectedArtistsChanged.InvokeAsync(SelectedArtists);
+    }
+}
