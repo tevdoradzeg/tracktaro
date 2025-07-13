@@ -65,6 +65,8 @@ public class ArtistsController : ControllerBase
     {
         var artist = await _context.Artists
             .Include(a => a.Items)
+                .ThenInclude(i => i.Discs)
+                    .ThenInclude(d => d.Tracks)
             .Include(a => a.Members)
             .FirstOrDefaultAsync(a => a.Id == id);
 

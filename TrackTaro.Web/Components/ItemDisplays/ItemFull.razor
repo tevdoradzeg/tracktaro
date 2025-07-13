@@ -54,7 +54,7 @@
             </div>
             <div class="col-md-7">
                 <ul class="list-group list-group-flush">
-                    @foreach (var track in disc.Tracks.Reverse())
+                    @foreach (var track in disc.Tracks.OrderBy(t => t.TrackNumber))
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>@track.TrackNumber.ToString("D2"): @track.Name</span>

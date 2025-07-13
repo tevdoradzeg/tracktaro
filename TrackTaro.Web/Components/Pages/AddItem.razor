@@ -271,7 +271,7 @@ Basically the JSRuntime we use in auth service has to be called after the initia
                 {
                     foreach (var artist in _selectedArtists)
                     {
-                        var linkDto = new { ArtistId = artist.Id };
+                        ArtistToItemDto linkDto = new (){ ArtistId = artist.Id };
                         await Http.PostAsJsonAsync($"api/items/{newItem.Id}/artists", linkDto);
                     }
                     NavigationManager.NavigateTo($"/item/{newItem.Id}");

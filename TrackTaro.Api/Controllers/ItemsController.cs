@@ -173,7 +173,7 @@ public class ItemsController : ControllerBase
 
     // POST: api/items/{itemId}/artists
     [HttpPost("{itemId}/artists")]
-    [ApiKey]
+    // [ApiKey]
     public async Task<IActionResult> LinkArtistToItem(int itemId, [FromBody] ArtistToItemDto artistToItemDto)
     {
         Item? item = await _context.Items
@@ -183,7 +183,7 @@ public class ItemsController : ControllerBase
         if (item == null) { return NotFound("Item not found."); } // 404 Not Found if item does not exist
 
         Artist? artist = await _context.Artists
-            .FirstOrDefaultAsync(a => a.Id == artistToItemDto.AristId);
+            .FirstOrDefaultAsync(a => a.Id == artistToItemDto.ArtistId);
         if (artist == null) { return NotFound("Artist not found."); } // 404 Not Found if artist does not exist
 
         if (item.Artists.Any(a => a.Id == artist.Id))
