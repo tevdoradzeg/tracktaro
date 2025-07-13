@@ -21,7 +21,6 @@ public class ItemsController : ControllerBase
     // GET: api/items
     // Endpoint for searching with parameters
     [HttpGet]
-    // [ApiKey]
     public async Task<ActionResult<IEnumerable<ItemShortDto>>> GetItems(
         [FromQuery] string? name,
         [FromQuery] string? timeAcquired,
@@ -103,6 +102,7 @@ public class ItemsController : ControllerBase
     // POST: api/items
     // Endpoint for creating a new item
     [HttpPost]
+    [ApiKey]
     public async Task<ActionResult<ItemDto>> CreateItem([FromBody] CreateItemDto itemDto)
     {
         if (itemDto == null) { return BadRequest("Item data is required."); } // 400 Bad Request if item data is null
@@ -172,7 +172,7 @@ public class ItemsController : ControllerBase
 
     // POST: api/items/{itemId}/artists
     [HttpPost("{itemId}/artists")]
-    // [ApiKey]
+    [ApiKey]
     public async Task<IActionResult> LinkArtistToItem(int itemId, [FromBody] ArtistToItemDto artistToItemDto)
     {
         Item? item = await _context.Items
@@ -194,5 +194,25 @@ public class ItemsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok(new { Message = "Artist linked to item successfully." }); // 200 OK response
+    }
+
+    // DELETE: api/items/{itemId}
+    [HttpDelete("{itemId}")]
+    [ApiKey]
+    public async Task<IActionResult> DeleteItem(int itemId)
+    {
+        Item? item = await _context.Items
+            .Include(i => i.Artists)
+            .Include(i => i.Discs)
+                .ThenInclude(d => d.Tracks)
+            .Include(i => i.BookletImages)
+            .FirstOrDefaultAsync(i => i.Id == itemId);
+
+        if (item == null) { return NotFound("Item not found."); } // 404 Not Found if item does not exist
+
+        _context.Items.Remove(item);
+        await _context.SaveChangesAsync();
+
+        return NoContent(); // 204 No Content response
     }
 }

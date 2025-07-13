@@ -1,0 +1,173 @@
+@page "/add/artist"
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject AuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@using TrackTaro.Shared.Dtos
+@using TrackTaro.Web.Components.ViewModels
+
+<PageTitle>Add New Artist | TrackTaro</PageTitle>
+
+<div class="add-item-page container mt-5 ml-5 mb-5">
+    @* Handle auth *@
+    @if (_isCheckingAuth)
+    {
+        <p>Checking authentication...</p>
+    }
+    else
+    {
+        <EditForm Model="@_model" OnValidSubmit="HandleSaveArtist">
+            <DataAnnotationsValidator />
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Artist Name</label>
+                        <InputText class="form-control" @bind-Value="_model.Name" @oninput="SearchArtists" />
+                        <ValidationMessage For="@(() => _model.Name)" />
+                    </div>
+
+                    @if (_suggestions.Any())
+                    {
+                        <div class="list-group mb-3">
+                            @foreach (var suggestion in _suggestions)
+                            {
+                                <button type="button" class="list-group-item list-group-item-action" @onclick="() => SelectSuggestion(suggestion)">
+                                    <strong>@suggestion.Name</strong>
+                                    <small class="text-muted d-block">
+                                        @suggestion.Country @(!string.IsNullOrEmpty(suggestion.Disambiguation) ? $"({suggestion.Disambiguation})" : "")
+                                    </small>
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Country</label>
+                        <InputText class="form-control" @bind-Value="_model.Country" />
+                    </div>
+
+                    <hr />
+                    <div class="mb-3">
+                        <label class="form-label">Members</label>
+                        @if (_model.Members.Any())
+                        {
+                            <ul class="list-group mb-2">
+                                @foreach (var member in _model.Members)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @member
+                                        <button type="button" class="btn-close" aria-label="Remove" @onclick="() => RemoveMember(member)"></button>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="New member name..." @bind="_newMemberName" />
+                            <button class="btn btn-outline-secondary" type="button" @onclick="AddMember">Add Member</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Save Artist</button>
+                </div>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert alert-danger mt-3">
+                <strong>Error:</strong> @_errorMessage
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool _isCheckingAuth = true;
+    private AddArtistViewModel _model = new();
+    private List<ArtistSuggestionDto> _suggestions = new();
+    private System.Threading.Timer? _timer;
+    private string? _errorMessage;
+    private string? _newMemberName;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // This logic must run only on the client after the initial render.
+        if (firstRender)
+        {
+            var isAuthenticated = await AuthenticationService.IsAuthenticatedAsync();
+            if (!isAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                _isCheckingAuth = false;
+                StateHasChanged(); // Re-render the component to show the content
+            }
+        }
+    }
+
+    private void SearchArtists(ChangeEventArgs e)
+    {
+        var searchTerm = e.Value?.ToString();
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            if (!string.IsNullOrWhiteSpace(searchTerm) && searchTerm.Length > 2)
+            {
+                var response = await Http.GetAsync($"api/artists/search-external?name={Uri.EscapeDataString(searchTerm)}");
+                if (response.IsSuccessStatusCode)
+                {
+                    _suggestions = await response.Content.ReadFromJsonAsync<List<ArtistSuggestionDto>>() ?? new();
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                _suggestions.Clear();
+                await InvokeAsync(StateHasChanged);
+            }
+        }, null, 500, Timeout.Infinite);
+    }
+
+    private void SelectSuggestion(ArtistSuggestionDto suggestion)
+    {
+        _model.Name = suggestion.Name;
+        _model.Country = suggestion.Country;
+        _suggestions.Clear();
+    }
+
+    private void AddMember()
+    {
+        if (!string.IsNullOrWhiteSpace(_newMemberName))
+        {
+            _model.Members.Add(_newMemberName);
+            _newMemberName = string.Empty; // Clear the input
+        }
+    }
+
+    private void RemoveMember(string member)
+    {
+        _model.Members.Remove(member);
+    }
+
+    private async Task HandleSaveArtist()
+    {
+        var dto = new CreateArtistDto
+        {
+            Name = _model.Name,
+            Country = _model.Country,
+            Members = _model.Members
+        };
+        
+        var response = await Http.PostAsJsonAsync("api/artists", dto);
+        if(response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/add/item"); // Go back to the add item page
+        }
+        else
+        {
+            _errorMessage = "Failed to save artist.";
+        }
+    }
+}

@@ -12,16 +12,17 @@ namespace TrackTaro.Api.Controllers;
 public class ArtistsController : ControllerBase
 {
     private readonly MusicDbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public ArtistsController(MusicDbContext context)
+    public ArtistsController(MusicDbContext context, IHttpClientFactory httpClientFactory)
     {
         _context = context;
+        _httpClientFactory = httpClientFactory;
     }
 
     // GET: api/artists
     // Endpoint for searching with parameters
     [HttpGet]
-    // [ApiKey]
     public async Task<ActionResult<IEnumerable<ArtistDto>>> GetArtists(
         [FromQuery] string? name,
         [FromQuery] string? country,
@@ -73,5 +74,66 @@ public class ArtistsController : ControllerBase
         }
 
         return Ok(artist.ToDto()); // Return the artist details as DTO
+    }
+
+    // POST: api/artists
+    [HttpPost]
+    public async Task<ActionResult<ArtistDto>> CreateArtist([FromBody] CreateArtistDto artistDto)
+    {
+        if (artistDto == null) { return BadRequest("Artist data is required."); }
+
+        Artist newArtist = new Artist
+        {
+            Name = artistDto.Name,
+            Country = artistDto.Country,
+            Members = artistDto.Members.Select(name => new Member { Name = name }).ToList()
+        };
+
+        _context.Artists.Add(newArtist);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetArtist), new { id = newArtist.Id }, newArtist.ToDto()); // 201 for success
+    }
+
+    [HttpGet("search-external")]
+    public async Task<IActionResult> SearchMusicBrainz([FromQuery] string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return BadRequest("Artist name is required.");
+        }
+
+        HttpClient client = _httpClientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "TrackTaro/1.0 ( tevdoradzege@gmail.com )");
+
+        string ulr = $"https://musicbrainz.org/ws/2/artist/?query=artist:{Uri.EscapeDataString(name)}&fmt=json";
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(ulr);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<MusicBrainzSearchResult>();
+
+                // Empty list if no artists found
+                if (result?.Artists == null)
+                {
+                    return Ok(new List<ArtistSuggestionDto>());
+                }
+
+                var suggestions = result.Artists.Select(artist => new ArtistSuggestionDto
+                {
+                    Name = artist.Name,
+                    Country = artist.Area?.Name ?? artist.CountryCode ?? "N/A",
+                    Disambiguation = artist.Disambiguation ?? ""
+                }).ToList();
+
+                return Ok(suggestions);
+            }
+            return StatusCode((int)response.StatusCode, "Error fetching data from MusicBrainz.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 }
