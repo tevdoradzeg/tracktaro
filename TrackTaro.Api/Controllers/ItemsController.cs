@@ -114,7 +114,7 @@ public class ItemsController : ControllerBase
             Year = itemDto.Year,
             Description = itemDto.Description,
             Publisher = itemDto.Publisher,
-            Label = itemDto.Lable,
+            Label = itemDto.Label,
             Type = itemDto.Type,
             CoverImagePath = itemDto.CoverImagePath,
             BackImagePath = itemDto.BackImagePath,

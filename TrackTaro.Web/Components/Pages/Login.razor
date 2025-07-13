@@ -5,8 +5,8 @@
 
 <PageTitle>Login | TrackTaro</PageTitle>
 
-<div class="login-page mt-5 ml-5">
-    <h3>Login for Giorgi (and only the most trusted friends)</h3>
+<div class="login-page container mt-5 ml-5">
+    <h1>Login for Giorgi & Friends</h1>
     @* Suggested component by gemini https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.forms.editform?view=aspnetcore-9.0 *@
     <div class="card">
         <div class="card-body">
@@ -32,7 +32,6 @@
 </div>
 
 @code {
-    [Parameter, EditorRequired]
     public string RedirectTo { get; set; } = "/add/item";
 
     private class PasswordModel

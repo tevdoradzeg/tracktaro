@@ -2,25 +2,157 @@
 @rendermode InteractiveServer
 @inject AuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using TrackTaro.Web.Components.ViewModels
+@using TrackTaro.Shared
+@using TrackTaro.Shared.Dtos
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms 
 
 @* This ugly if else is in repsonse to the error of:
 InvalidOperationException: JavaScript interop calls cannot be issued at this time. This is because the component is being statically rendered. When prerendering is enabled, JavaScript interop calls can only be performed during the OnAfterRenderAsync lifecycle method.
 Basically the JSRuntime we use in auth service has to be called after the initial render (or so it seems)*@
 
-<div class="login-page mt-5 ml-5">
+<PageTitle>Add New Item | TrackTaro</PageTitle>
+
+<div class="add-item-page container mt-5 ml-5 mb-5">
+    @* Handle auth *@
     @if (_isCheckingAuth)
     {
         <p>Checking authentication...</p>
     }
     else
     {
-        <h3>Add New Item</h3>
+        @* Add item *@
+        <h1>Add New Item</h1>
+
+        <EditForm Model="@_model" OnValidSubmit="HandleAddItem" OnInvalidSubmit="HandleInvalidSubmit" FormName="addItemForm">
+        <DataAnnotationsValidator />
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h4>Item Details</h4></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <InputText class="form-control" @bind-Value="_model.Name" />
+                    <ValidationMessage For="@(() => _model.Name)" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Year</label>
+                        <InputNumber class="form-control" @bind-Value="_model.Year" />
+                        <ValidationMessage For="@(() => _model.Year)" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" @bind-Value="_model.Description" rows="3" />
+                    <ValidationMessage For="@(() => _model.Description)" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Publisher</label>
+                    <InputText class="form-control" @bind-Value="_model.Publisher" />
+                    <ValidationMessage For="@(() => _model.Publisher)" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Label</label>
+                    <InputText class="form-control" @bind-Value="_model.Label" />
+                    <ValidationMessage For="@(() => _model.Label)" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <InputSelect class="form-select" @bind-Value="_model.Type">
+                        <option value="">Select Type</option>
+                        @foreach (var type in Enum.GetValues<ItemType>())
+                        {
+                            <option value="@type">@type.ToString()</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => _model.Type)" />
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h4>Images</h4></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Cover Image</label>
+                    <InputFile class="form-control" OnChange="@(e => _model.CoverImageFile = e.File)" />
+                    @if(_model.CoverImageFile != null) { <small class="text-muted">Selected: @_model.CoverImageFile</small> }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Back Cover Image</label>
+                    <InputFile class="form-control" OnChange="@(e => _model.BackImageFile = e.File)" />
+                    @if(_model.BackImageFile != null) { <small class="text-muted">Selected: @_model.BackImageFile</small> }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Booklet Images</label>
+                    <InputFile class="form-control" OnChange="@(e => _model.BookletImageFiles.AddRange(e.GetMultipleFiles()))" multiple />
+                    @foreach(var file in _model.BookletImageFiles) { <small class="d-block text-muted">Selected: @file.Name</small> }
+                </div>
+            </div>
+        </div>
+
+        @foreach (var (disc, index) in _model.Discs.Select((d, i) => (d, i)))
+        {
+            <div class="card shadow-sm mb-4" @key="disc.Id">
+                <div class="card-header"><h4>Disc: @disc.Number</h4></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                            <InputSelect class="form-select" @bind-Value="disc.Type">
+                                <option value="">Select Type</option>
+                                @foreach (var type in Enum.GetValues<DiscType>())
+                                {
+                                    <option value="@type">@type.ToString()</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => disc.Type)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Disc Image</label>
+                        <InputFile class="form-control" OnChange="@(e => disc.DiscImageFile = e.File)" />
+                        @if(disc.DiscImageFile != null) { <small class="text-muted">Selected: @disc.DiscImageFile.Name</small> }
+                    </div>
+                    
+                    <h5>Tracks</h5>
+                    @foreach (var track in disc.Tracks)
+                    {
+                        <div class="row gx-2 align-items-center mb-2" @key="track.Id">
+                            <div class="col-1">@track.TrackNumber</div>
+                            <div class="col"><InputText @bind-Value="track.Name" class="form-control form-control-sm" /></div>
+                            <ValidationMessage For="@(() => @track.Name)" />
+                            @* after investigation of https://stackoverflow.com/questions/54868854/how-to-bind-input-of-type-time-with-blazor *@
+                            <div class="col-2"><InputText @bind-Value="track.Duration" class="form-control form-control-sm" placeholder="hh:mm:ss" /></div>
+                            <ValidationMessage For="@(() => @track.Duration)" />
+                        </div>
+                    }
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => AddTrack(disc.Id)">+ Add Track</button>
+                </div>
+            </div>
+        }
+        <button type="button" class="btn btn-secondary mb-3" @onclick="AddDisc">+ Add Disc</button>
+        
+        <hr />
+        <button type="submit" class="btn btn-primary btn-lg" disabled="@_isSaving">
+             @if (_isSaving) { <span class="spinner-border spinner-border-sm"></span> }
+            Save Item
+        </button>
+        
+        @if(!string.IsNullOrEmpty(_errorMessage)) { <div class="alert alert-danger mt-3">@_errorMessage</div> }
+        </EditForm>
     }
 
 </div>
 
 @code {
+    // Firstrender stuff
     private bool _isCheckingAuth = true;
+    private bool _isSaving = false;
+    private string? _errorMessage;
+    private AddItemViewModel _model = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -38,5 +170,114 @@ Basically the JSRuntime we use in auth service has to be called after the initia
                 StateHasChanged(); // Re-render the component to show the content
             }
         }
+    }
+
+    // Adding logic
+    private void AddDisc() => _model.Discs.Add(new AddDiscViewModel { Number = _model.Discs.Count + 1 });
+    private void AddTrack(Guid discIndex)
+    {
+        var disc = _model.Discs.FirstOrDefault(d => d.Id == discIndex);
+        if (disc != null)
+        {
+            disc.Tracks.Add(new AddTrackViewModel { TrackNumber = disc.Tracks.Count + 1 });
+            StateHasChanged();
+        }
+    }
+    private class UploadResult { public string? FilePath { get; set; } }
+
+    private async Task<string> UploadFileAsync(IBrowserFile file, string uploadType)
+    {
+        using var content = new MultipartFormDataContent();
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB limit
+        content.Add(new StreamContent(stream), "file", file.Name);
+
+        var response = await Http.PostAsync($"api/files/upload/{uploadType}", content);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<UploadResult>();
+            return result?.FilePath ?? string.Empty;
+        }
+        throw new Exception($"Failed to uplaod: {file.Name}");
+    }
+
+    private async Task HandleAddItem()
+    {
+        _isSaving = true;
+        _errorMessage = null;
+
+        // Convert ViewModel to DTO
+        var createDto = new CreateItemDto
+        {
+            Name = _model.Name,
+            Year = _model.Year,
+            Description = _model.Description,
+            Publisher = _model.Publisher,
+            Label = _model.Label,
+            Type = _model.Type
+        };
+
+        // Handle file uploads
+        try
+        {
+            if (_model.CoverImageFile != null)
+            {
+                createDto.CoverImagePath = await UploadFileAsync(_model.CoverImageFile, "cover");
+            }
+            if (_model.BackImageFile != null)
+            {
+                createDto.BackImagePath = await UploadFileAsync(_model.BackImageFile, "back");
+            }
+            foreach (var file in _model.BookletImageFiles)
+            {
+                var path = await UploadFileAsync(file, "booklet");
+                createDto.BookletImagePaths.Add(path);
+            }
+
+            foreach (var discModel in _model.Discs)
+            {
+                var discDto = new CreateDiscDto
+                {
+                    Number = discModel.Number,
+                    Type = discModel.Type,
+                    Tracks = discModel.Tracks.Select(t => new CreateTrackDto
+                    {
+                        Name = t.Name,
+                        TrackNumber = t.TrackNumber,
+                        Duration = TimeSpan.TryParse(t.Duration, out var duration) ? duration : TimeSpan.Zero
+                    }).ToList()
+                };
+
+                // Handle disc image upload
+                if (discModel.DiscImageFile != null)
+                {
+                    discDto.DiscImagePath = await UploadFileAsync(discModel.DiscImageFile, "disc");
+                }
+                createDto.Discs.Add(discDto);
+            }
+
+            var response = await Http.PostAsJsonAsync("api/items", createDto);
+            if (response.IsSuccessStatusCode)
+            {
+                var newItem = await response.Content.ReadFromJsonAsync<ItemDto>();
+                NavigationManager.NavigateTo($"/item/{newItem?.Id}");
+            }
+            else
+            {
+                _errorMessage = $"Error saving item: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        _errorMessage = "Please fill out all fields correctly before submitting.";
     }
 }

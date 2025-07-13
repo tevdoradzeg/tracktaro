@@ -8,13 +8,18 @@ public class UploadHandler
     public string Upload(IFormFile file)
     {
         // Check for empty file
-        if (file == null | file.Length == 0)
+        if (file == null)
         {
             return "Invalid: No file uploaded.";
         }
 
+        if (file.Length == 0)
+        {
+            return "Invalid: File is empty.";
+        }
+
         // Check extension
-        string inpExtension = Path.GetExtension(file.FileName);
+            string inpExtension = Path.GetExtension(file.FileName);
         if (!_validExtensions.Contains(inpExtension)) { return $"Invalid file extension: {inpExtension}"; }
 
         // Check size

@@ -46,7 +46,7 @@ public class CreateItemDto
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Publisher { get; set; } = string.Empty;
-    public string Lable { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
     public ItemType Type { get; set; }
     public string CoverImagePath { get; set; } = string.Empty;
     public string BackImagePath { get; set; } = string.Empty;
