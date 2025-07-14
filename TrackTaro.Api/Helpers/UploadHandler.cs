@@ -2,7 +2,7 @@ namespace TrackTaro.Api.Helpers;
 
 public class UploadHandler
 {
-    private List<string> _validExtensions = [".png", ".jpg"];
+    private List<string> _validExtensions = [".png", ".jpg", ".jpeg", ".PNG", ".JPG", ".JPEG"];
     private const long sizeLimit = 5 * 1024 * 1024;
 
     public string Upload(IFormFile file)

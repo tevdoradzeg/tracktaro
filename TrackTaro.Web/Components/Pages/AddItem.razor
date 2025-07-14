@@ -86,16 +86,16 @@ Basically the JSRuntime we use in auth service has to be called after the initia
                 <div class="mb-3">
                     <label class="form-label">Cover Image</label>
                     <InputFile class="form-control" OnChange="@(e => _model.CoverImageFile = e.File)" />
-                    @if(_model.CoverImageFile != null) { <small class="text-muted">Selected: @_model.CoverImageFile</small> }
+                    @if(_model.CoverImageFile != null) { <small class="text-muted">Selected: @_model.CoverImageFile.Name</small> }
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Back Cover Image</label>
                     <InputFile class="form-control" OnChange="@(e => _model.BackImageFile = e.File)" />
-                    @if(_model.BackImageFile != null) { <small class="text-muted">Selected: @_model.BackImageFile</small> }
+                    @if(_model.BackImageFile != null) { <small class="text-muted">Selected: @_model.BackImageFile.Name</small> }
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Booklet Images</label>
-                    <InputFile class="form-control" OnChange="@(e => _model.BookletImageFiles.AddRange(e.GetMultipleFiles(20)))" multiple />
+                    <InputFile class="form-control" OnChange="HandleBookletFilesSelected" multiple />
                     @foreach(var file in _model.BookletImageFiles) { <small class="d-block text-muted">Selected: @file.Name</small> }
                 </div>
             </div>
@@ -104,7 +104,15 @@ Basically the JSRuntime we use in auth service has to be called after the initia
         @foreach (var (disc, index) in _model.Discs.Select((d, i) => (d, i)))
         {
             <div class="card shadow-sm mb-4" @key="disc.Id">
-                <div class="card-header"><h4>Disc: @disc.Number</h4></div>
+                <div class="card-header">
+                    <div class="hstack">
+                        <h4>Disc: @disc.Number</h4>
+                        @if (_model.Discs.Count > 1)
+                        {
+                            <button type="button" class="btn-close mb-1" aria-label="Remove Disc" @onclick="() => RemoveDisc(disc.Id)"></button>
+                        }
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Type</label>
@@ -127,13 +135,18 @@ Basically the JSRuntime we use in auth service has to be called after the initia
                     <h5>Tracks</h5>
                     @foreach (var track in disc.Tracks)
                     {
-                        <div class="row gx-2 align-items-center mb-2" @key="track.Id">
-                            <div class="col-1">@track.TrackNumber</div>
-                            <div class="col"><InputText @bind-Value="track.Name" class="form-control form-control-sm" /></div>
-                            <ValidationMessage For="@(() => @track.Name)" />
-                            @* after investigation of https://stackoverflow.com/questions/54868854/how-to-bind-input-of-type-time-with-blazor *@
-                            <div class="col-2"><InputText @bind-Value="track.Duration" class="form-control form-control-sm" placeholder="hh:mm:ss" /></div>
-                            <ValidationMessage For="@(() => @track.Duration)" />
+                        <div class="hstack">
+                            <div class="row gx-2 align-items-center mb-2 w-100 p2" @key="track.Id">
+                                <div class="col-1">@track.TrackNumber</div>
+                                <div class="col"><InputText @bind-Value="track.Name" class="form-control form-control-sm" /></div>
+                                <ValidationMessage For="@(() => @track.Name)" />
+                                @* after investigation of https://stackoverflow.com/questions/54868854/how-to-bind-input-of-type-time-with-blazor *@
+                                <div class="col-2"><InputText @bind-Value="track.Duration" class="form-control form-control-sm" placeholder="hh:mm:ss" /></div>
+                                <ValidationMessage For="@(() => @track.Duration)" />
+                            </div>
+                            <div class="col-auto p2 ms-auto mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveTrack(disc.Id, track.Id)">Remove</button>
+                            </div>
                         </div>
                     }
                     <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => AddTrack(disc.Id)">+ Add Track</button>
@@ -161,6 +174,7 @@ Basically the JSRuntime we use in auth service has to be called after the initia
     private string? _errorMessage;
     private AddItemViewModel _model = new();
     private List<ArtistDto> _selectedArtists = new();
+    private const int MaxAllowedFiles = 20; // Maximum number of booklet images allowed
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -180,17 +194,52 @@ Basically the JSRuntime we use in auth service has to be called after the initia
         }
     }
 
-    // Adding logic
+    // Adding/Removing logic
     private void AddDisc() => _model.Discs.Add(new AddDiscViewModel { Number = _model.Discs.Count + 1 });
+    private void RemoveDisc(Guid discId)
+    {
+        var discToRemove = _model.Discs.FirstOrDefault(d => d.Id == discId);
+        if (discToRemove != null)
+        {
+            _model.Discs.Remove(discToRemove);
+            _model.Discs = _model.Discs.Select((d, i) => 
+            {
+                d.Number = i + 1;
+                return d;
+            }).ToList();
+            StateHasChanged();
+        }
+    }
+
     private void AddTrack(Guid discIndex)
     {
         var disc = _model.Discs.FirstOrDefault(d => d.Id == discIndex);
         if (disc != null)
         {
             disc.Tracks.Add(new AddTrackViewModel { TrackNumber = disc.Tracks.Count + 1 });
+            disc.Tracks = disc.Tracks.Select((t, i) => 
+            {
+                t.TrackNumber = i + 1;
+                return t;
+            }).ToList();
             StateHasChanged();
         }
     }
+    private void RemoveTrack(Guid discId, Guid trackId)
+    {
+        var disc = _model.Discs.FirstOrDefault(d => d.Id == discId);
+        if (disc != null)
+        {
+            var trackToRemove = disc.Tracks.FirstOrDefault(t => t.Id == trackId);
+            if (trackToRemove != null)
+            {
+                disc.Tracks.Remove(trackToRemove);
+                StateHasChanged();
+            }
+        }
+    }
+
+
     private class UploadResult { public string? FilePath { get; set; } }
 
     private async Task<string> UploadFileAsync(IBrowserFile file, string uploadType)
@@ -295,5 +344,19 @@ Basically the JSRuntime we use in auth service has to be called after the initia
     private void HandleInvalidSubmit()
     {
         _errorMessage = "Please fill out all fields correctly before submitting.";
+    }
+
+
+    // To avoid errors thrown directly from the InputFile component
+    private void HandleBookletFilesSelected(InputFileChangeEventArgs e)
+    {
+        _errorMessage = null; // Clear previous errors
+        if (e.FileCount > MaxAllowedFiles)
+        {
+            _errorMessage = $"Error: Cannot upload more than {MaxAllowedFiles} files at once.";
+            _model.BookletImageFiles.Clear(); // Clear the selection
+            return;
+        }
+        _model.BookletImageFiles = e.GetMultipleFiles(MaxAllowedFiles).ToList();
     }
 }
