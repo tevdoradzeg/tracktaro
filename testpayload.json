@@ -1,0 +1,68 @@
+{
+  "year": 1969,
+  "name": "Led Zeppelin II",
+  "description": "Digitally remastered from the original master tapes by Jimmy Page and George Marino at Sterling Sound, New York City, 1994.",
+  "publisher": "Warner Music Manufacturing Europe",
+  "label": "Atlantic",
+  "type": 0,
+  "coverImagePath": "/uploads/covers/zepellin2_cover.JPG",
+  "backImagePath": "/uploads/backs/zeppelin2_back.JPG",
+  "discs": [
+    {
+      "discImagePath": "/uploads/discs/zeppelin2_disc.png",
+      "number": 1,
+      "type": 0,
+      "tracks": [
+        {
+          "name": "Whole Lotta Love",
+          "duration": "00:05:34",
+          "trackNumber": 1
+        },
+        {
+          "name": "What is and What Should Never Be",
+          "duration": "00:04:44",
+          "trackNumber": 2
+        },
+        {
+          "name": "The Lemon Song",
+          "duration": "00:06:19",
+          "trackNumber": 3
+        },
+        {
+          "name": "Thank You",
+          "duration": "00:04:47",
+          "trackNumber": 4
+        },
+        {
+          "name": "Heartbreaker",
+          "duration": "00:04:14",
+          "trackNumber": 5
+        },
+        {
+          "name": "Living Loving Maid (She's Just a Woman)",
+          "duration": "00:02:39",
+          "trackNumber": 6
+        },
+        {
+          "name": "Ramble on",
+          "duration": "00:04:23",
+          "trackNumber": 7
+        },
+        {
+          "name": "Moby Dick",
+          "duration": "00:04:21",
+          "trackNumber": 8
+        },
+        {
+          "name": "Bring it on Home",
+          "duration": "00:04:20",
+          "trackNumber": 9
+        }
+      ]
+    }
+  ],
+  "bookletImagePaths": [
+    "/uploads/booklets/zeppelin2_booklet1.JPG",
+    "/uploads/booklets/zeppelin2_booklet2.JPG"
+  ]
+}

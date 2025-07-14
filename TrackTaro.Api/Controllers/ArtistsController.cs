@@ -97,6 +97,8 @@ public class ArtistsController : ControllerBase
         return CreatedAtAction(nameof(GetArtist), new { id = newArtist.Id }, newArtist.ToDto()); // 201 for success
     }
 
+    // GET: api/artists/search-external
+    // Endpoint for searching artists in MusicBrainz
     [HttpGet("search-external")]
     public async Task<IActionResult> SearchMusicBrainz([FromQuery] string name)
     {
@@ -137,5 +139,28 @@ public class ArtistsController : ControllerBase
         {
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
+    }
+
+    // DELETE: api/artists/{id}
+    [HttpDelete("{id}")]
+    // [ApiKey]
+    public async Task<IActionResult> DeleteArtist(int id)
+    {
+        var artist = await _context.Artists
+            .Include(a => a.Items)
+                .ThenInclude(i => i.Discs)
+                    .ThenInclude(d => d.Tracks)
+            .Include(a => a.Members)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (artist == null)
+        {
+            return NotFound("Artist not found.");
+        }
+
+        _context.Artists.Remove(artist);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }

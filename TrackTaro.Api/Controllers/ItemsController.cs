@@ -102,7 +102,7 @@ public class ItemsController : ControllerBase
     // POST: api/items
     // Endpoint for creating a new item
     [HttpPost]
-    [ApiKey]
+    // [ApiKey]
     public async Task<ActionResult<ItemDto>> CreateItem([FromBody] CreateItemDto itemDto)
     {
         if (itemDto == null) { return BadRequest("Item data is required."); } // 400 Bad Request if item data is null
@@ -199,7 +199,7 @@ public class ItemsController : ControllerBase
 
     // DELETE: api/items/{itemId}
     [HttpDelete("{itemId}")]
-    [ApiKey]
+    // [ApiKey]
     public async Task<IActionResult> DeleteItem(int itemId)
     {
         Item? item = await _context.Items
