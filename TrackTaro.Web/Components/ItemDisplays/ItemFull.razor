@@ -2,7 +2,6 @@
 @using TrackTaro.Shared.Dtos;
 
 <div class="container mt-4">
-    <!-- Cover and Back -->
     <div class="row justify-content-center g-4 mb-5">
         @if (!string.IsNullOrWhiteSpace(Item.CoverImagePath))
         {
@@ -22,14 +21,15 @@
         }
     </div>
 
-    <!-- Details -->
     <hr/>
     <div class="col-md-8">
         <h1>@Item.Name</h1>
         <h3>
             @foreach (var artist in Item.Artists)
             {
-                <a href="artist/@artist.Id" class="text-dark text-decoration-none">@artist.Name </a>
+                <div class="mr-1">
+                    <a href="artist/@artist.Id" class="text-dark text-decoration-none">@artist.Name</a>
+                </div>
             }
         </h3>
         <h5 class="text-muted">@Item.Type.ToString()</h5>
@@ -42,7 +42,6 @@
         }
     </div>
 
-    <!-- Discs -->
     @foreach(var disc in Item.Discs)
     {
         <hr/>
@@ -66,7 +65,6 @@
         </div>
     }
 
-    <!-- Booklet images -->
     @if (Item.BookletImages.Any())
     {
         <hr2 class="mb-4" />
