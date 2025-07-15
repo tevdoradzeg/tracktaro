@@ -1,8 +1,113 @@
 ﻿@page "/"
+@inject HttpClient Http
+@using TrackTaro.Shared.Dtos
 
 <PageTitle>Gallery | TrackTaro</PageTitle>
 
 <div class="about-page container mt-5 ml-5">
     <h1>Gallery Showcase</h1>
 
+    @if (_isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(_error))
+    {
+        <div class="alert alert-danger">@_error</div>
+    }
+    else
+    {
+        <section class="mb-5">
+            <h2 class="pb-2 border-bottom">Items</h2>
+            @if (_items != null && _items.Any())
+            {
+                <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+                    @foreach (var item in _items.OrderBy(i => i.Name))
+                    {
+                        <div class="col">
+                            <a href="/item/@item.Id" class="text-decoration-none">
+                                <div class="card h-100 shadow-sm gallery-card">
+                                    <img src="@(new Uri(Http.BaseAddress!, item.CoverImagePath))" class="card-img-top" alt="@item.Name" 
+                                         onerror="this.onerror=null;this.src='/images/placeholder.png';" />
+                                    <div class="card-footer text-center h-100">
+                                        <small class="text-muted">@item.Name</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No items found in the collection.</p>
+            }
+        </section>
+
+        <section>
+            <h2 class="pb-2 border-bottom">Artists</h2>
+            @if (_artists != null && _artists.Any())
+            {
+                <div class="list-group">
+                    @foreach (var artist in _artists.OrderBy(a => a.Name))
+                    {
+                        <a href="/artist/@artist.Id" class="list-group-item list-group-item-action">
+                            @artist.Name
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>No artists found in the collection.</p>
+            }
+        </section>
+    }
 </div>
+
+<style>
+    .gallery-card {
+        transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+    }
+    .gallery-card:hover {
+        transform: scale(1.05);
+    }
+    .gallery-card img {
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+</style>
+
+@code {
+    private List<ItemDto>? _items;
+    private List<ArtistDto>? _artists;
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch both items and artists concurrently for faster loading
+            var itemsTask = Http.GetFromJsonAsync<List<ItemDto>>("api/items");
+            var artistsTask = Http.GetFromJsonAsync<List<ArtistDto>>("api/artists");
+
+            await Task.WhenAll(itemsTask, artistsTask);
+
+            _items = itemsTask.Result;
+            _artists = artistsTask.Result;
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to load data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

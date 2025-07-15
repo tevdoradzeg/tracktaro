@@ -6,29 +6,38 @@
 <PageTitle>Login | TrackTaro</PageTitle>
 
 <div class="login-page container mt-5 ml-5">
-    <h1>Login for Giorgi & Friends</h1>
-    @* Suggested component by gemini https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.forms.editform?view=aspnetcore-9.0 *@
-    <div class="card">
-        <div class="card-body">
-            <EditForm Model="@pModel" OnValidSubmit="HandleLogin">
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <InputText id="password" class="form-control" @bind-Value="pModel.Password" type="password" required/>
-                </div>
-                @if (!string.IsNullOrWhiteSpace(_error))
-                {
-                    <div class="alert alert-danger">@_error</div>
-                }
-                <button type="submit" class="btn btn-primary" disabled="@_isLoading">
-                    @if (_isLoading)
-                    {
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    }
-                    Login
-                </button>
-            </EditForm>
+    @if (_isLoggedIn)
+    {
+        <div class="alert alert-info">
+            You are already logged in. <a href="/">Go to Gallery</a>
         </div>
-    </div>
+    }
+    else
+    {
+        <h1>Login for Giorgi & Friends</h1>
+        @* Suggested component by gemini https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.forms.editform?view=aspnetcore-9.0 *@
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@pModel" OnValidSubmit="HandleLogin">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <InputText id="password" class="form-control" @bind-Value="pModel.Password" type="password" required/>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(_error))
+                    {
+                        <div class="alert alert-danger">@_error</div>
+                    }
+                    <button type="submit" class="btn btn-primary" disabled="@_isLoading">
+                        @if (_isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        }
+                        Login
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
@@ -42,6 +51,7 @@
     private PasswordModel pModel { get; set; } = new PasswordModel();
     private string? _error;
     private bool _isLoading;
+    private bool _isLoggedIn = false;
 
     private async Task HandleLogin()
     {
@@ -60,6 +70,15 @@
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isLoggedIn = await AuthenticationService.IsAuthenticatedAsync();
+            StateHasChanged();
         }
     }
 }
