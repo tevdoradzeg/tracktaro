@@ -24,3 +24,10 @@ public class CreateArtistDto
     // Since the dto would only contain member name use string instead
     public List<string> Members { get; set; } = new();
 }
+
+public class UpdateArtistDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+    public List<string> Members { get; set; } = new();
+}

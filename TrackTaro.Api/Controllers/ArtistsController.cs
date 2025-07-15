@@ -163,4 +163,25 @@ public class ArtistsController : ControllerBase
 
         return NoContent();
     }
+
+    // PUT: api/artists/{id}
+    [HttpPut("{id}")]
+    // [ApiKey]
+    public async Task<IActionResult> UpdateArtist(int id, [FromBody] UpdateArtistDto artistDto)
+    {
+        var artistToUpdate = await _context.Artists
+            .Include(a => a.Members)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (artistToUpdate == null) { return NotFound(); }
+
+        artistToUpdate.Name = artistDto.Name;
+        artistToUpdate.Country = artistDto.Country;
+
+        artistToUpdate.Members.Clear();
+        artistToUpdate.Members = artistDto.Members.Select(name => new Member { Name = name }).ToList();
+
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }

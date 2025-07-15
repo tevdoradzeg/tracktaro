@@ -17,3 +17,12 @@ public class CreateDiscDto
     public DiscType Type { get; set; }
     public List<CreateTrackDto> Tracks { get; set; } = new();
 }
+
+public class UpdateDiscDto
+{
+    public int Id { get; set; }
+    public int Number { get; set; }
+    public string DiscImagePath { get; set; } = string.Empty;
+    public DiscType Type { get; set; }
+    public List<UpdateTrackDto> Tracks { get; set; } = new();
+}

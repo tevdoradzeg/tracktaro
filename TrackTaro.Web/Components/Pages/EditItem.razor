@@ -1,0 +1,421 @@
+@page "/edit/item/{Id:int}"
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
+@using TrackTaro.Shared.Dtos
+@using TrackTaro.Web.Components.ViewModels
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using TrackTaro.Shared
+
+<PageTitle>Edit: @_model?.Name | TrackTaro</PageTitle>
+
+<div class="container mt-5 ml-5 mb-5">
+    @if (_isCheckingAuth)
+    {
+        <p>Checking authentication...</p>
+    }
+    else
+    {
+        @* Edit Item *@
+        <h1>Edit Item</h1>
+
+        <EditForm Model="@_model" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" FormName="editItemForm">
+        <DataAnnotationsValidator />
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h4>Artists</h4></div>
+            <div class="card-body">
+                <ArtistSelector @bind-SelectedArtists="_selectedArtists" />
+            </div>
+        </div>
+
+        @* Item Details Card *@
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h4>Item Details</h4>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Item Name</label>
+                    <InputText class="form-control" @bind-Value="_model.Name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Year</label>
+                    <InputNumber class="form-control" @bind-Value="_model.Year" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" @bind-Value="_model.Description" rows="3" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Publsiher</label>
+                    <InputText class="form-control" @bind-Value="_model.Publisher" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Label</label>
+                    <InputText class="form-control" @bind-Value="_model.Label" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <InputSelect class="form-select" @bind-Value="_model.Type">
+                        <option value="">Select Type</option>
+                        @foreach (var type in Enum.GetValues<ItemType>())
+                        {
+                            <option value="@type">@type.ToString()</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => _model.Type)" />
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header"><h4>Images</h4></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Cover Image</label>
+                    <InputFile class="form-control" OnChange="@(e => _model.CoverImageFile = e.File)" />
+                    @if(_model.CoverImageFile != null) { <small class="text-muted">Selected: @_model.CoverImageFile.Name</small> }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Back Cover Image</label>
+                    <InputFile class="form-control" OnChange="@(e => _model.BackImageFile = e.File)" />
+                    @if(_model.BackImageFile != null) { <small class="text-muted">Selected: @_model.BackImageFile.Name</small> }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Booklet Images</label>
+                    <InputFile class="form-control" OnChange="HandleBookletFilesSelected" multiple />
+                    @foreach(var file in _model.BookletImageFiles) { <small class="d-block text-muted">Selected: @file.Name</small> }
+                </div>
+            </div>
+        </div>
+
+        @* Discs and Tracks *@
+        @foreach (var disc in _model.Discs)
+        {
+            <div class="card shadow-sm mb-4" @key="disc.Guid">
+                <div class="card-header">
+                    <div class="hstack">
+                        <h4>Disc: @disc.Number</h4>
+                        @if (_model.Discs.Count > 1)
+                        {
+                            <button type="button" class="btn-close mb-1" aria-label="Remove Disc" @onclick="() => RemoveDisc(disc.Guid)"></button>
+                        }
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                            <InputSelect class="form-select" @bind-Value="disc.Type">
+                                <option value="">Select Type</option>
+                                @foreach (var type in Enum.GetValues<DiscType>())
+                                {
+                                    <option value="@type">@type.ToString()</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => disc.Type)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Disc Image</label>
+                        <InputFile class="form-control" OnChange="@(e => disc.DiscImageFile = e.File)" />
+                        @if(disc.DiscImageFile != null) { <small class="text-muted">Selected: @disc.DiscImageFile.Name</small> }
+                    </div>
+                    
+                    <h5>Tracks</h5>
+                    @foreach (var track in disc.Tracks)
+                    {
+                        <div class="hstack">
+                            <div class="row gx-2 align-items-center mb-2 w-100 p2" @key="track.Guid">
+                                <div class="col-1">@track.TrackNumber</div>
+                                <div class="col"><InputText @bind-Value="track.Name" class="form-control form-control-sm" /></div>
+                                <ValidationMessage For="@(() => @track.Name)" />
+                                <div class="col-2"><InputText @bind-Value="track.Duration" class="form-control form-control-sm" placeholder="hh:mm:ss" /></div>
+                                <ValidationMessage For="@(() => @track.Duration)" />
+                            </div>
+                            <div class="col-auto p2 ms-auto mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger" @onclick="() => RemoveTrack(disc.Guid, track.Guid)">Remove</button>
+                            </div>
+                        </div>
+                    }
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="() => AddTrack(disc.Guid)">+ Add Track</button>
+                </div>
+            </div>
+        }
+        <button type="button" class="btn btn-secondary mb-3" @onclick="AddDisc">+ Add Disc</button>
+        
+        <hr />
+        <button type="submit" class="btn btn-primary btn-lg">
+            @if (_isUpdating) { <span class="spinner-border spinner-border-sm"></span> }
+            Save Changes</button>
+        </EditForm>
+
+        @if(!string.IsNullOrEmpty(_error)) { <div class="alert alert-danger mt-3">@_error</div> }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private bool _isUpdating = false; 
+    private EditItemViewModel _model = new();
+    private string? _error;
+    private bool _isCheckingAuth = true;
+    private const int MaxAllowedFiles = 20; 
+    public bool _itemInitialized { get; set; } = false;
+    private List<ArtistDto> _selectedArtists = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // This logic must run only on the client after the initial render.
+        if (firstRender)
+        {
+            var isAuthenticated = await AuthenticationService.IsAuthenticatedAsync();
+            if (!isAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+            else
+            {
+                _isCheckingAuth = false;
+                StateHasChanged();
+            }
+        }
+
+        if (!_itemInitialized)
+        {
+            try 
+            {
+                var itemDto = await Http.GetFromJsonAsync<ItemDto>($"api/items/{Id}");
+
+                if (itemDto != null)
+                {
+                    _selectedArtists = itemDto.Artists.Select(a => new ArtistDto
+                    {
+                        Id = a.Id,
+                        Name = a.Name,
+                        Country = a.Country
+                    }).ToList();
+
+                    _model = new EditItemViewModel
+                    {
+                        Id = itemDto.Id,
+                        Name = itemDto.Name,
+                        Description = itemDto.Description,
+                        Year = itemDto.Year,
+                        Label = itemDto.Label,
+                        Publisher = itemDto.Publisher,
+                        ExistingCoverImagePath = itemDto.CoverImagePath,
+                        ExistingBackImagePath = itemDto.BackImagePath,
+                        Type = itemDto.Type,
+                        Discs = itemDto.Discs.Select(d => new EditDiscViewModel
+                        {
+                            Id = d.Id,
+                            Number = d.Number,
+                            ExistingDiscImagePath = d.DiscImagePath,
+                            Tracks = d.Tracks.Select(t => new EditTrackViewModel{
+                                Id = t.Id,
+                                Name = t.Name,
+                                TrackNumber = t.TrackNumber,
+                                Duration = t.Duration.ToString(@"hh\:mm\:ss"),
+                            }).ToList()
+                        }).ToList()
+                    };
+                }
+                else
+                {
+                    _error = "Item not found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _error = $"An error occurred while fetching item details: {ex.Message}";
+            }
+            finally
+            {
+                _itemInitialized = true;
+                StateHasChanged();
+            }
+        }
+    }
+
+    // Adding/Removing logic
+    private void AddDisc() => _model.Discs.Add(new EditDiscViewModel { Number = _model.Discs.Count + 1 });
+    private void RemoveDisc(Guid discId)
+    {
+        var discToRemove = _model.Discs.FirstOrDefault(d => d.Guid == discId);
+        if (discToRemove != null)
+        {
+            _model.Discs.Remove(discToRemove);
+            _model.Discs = _model.Discs.Select((d, i) => 
+            {
+                d.Number = i + 1;
+                return d;
+            }).ToList();
+            StateHasChanged();
+        }
+    }
+
+    private void AddTrack(Guid discIndex)
+    {
+        var disc = _model.Discs.FirstOrDefault(d => d.Guid == discIndex);
+        if (disc != null)
+        {
+            disc.Tracks.Add(new EditTrackViewModel { TrackNumber = disc.Tracks.Count + 1 });
+            disc.Tracks = disc.Tracks.Select((t, i) => 
+            {
+                t.TrackNumber = i + 1;
+                return t;
+            }).ToList();
+            StateHasChanged();
+        }
+    }
+    private void RemoveTrack(Guid discId, Guid trackId)
+    {
+        var disc = _model.Discs.FirstOrDefault(d => d.Guid == discId);
+        if (disc != null)
+        {
+            var trackToRemove = disc.Tracks.FirstOrDefault(t => t.Guid == trackId);
+            if (trackToRemove != null)
+            {
+                disc.Tracks.Remove(trackToRemove);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (_model == null) { return; }
+
+        _isUpdating = true;
+        _error= null;
+ 
+        var updateDto = new UpdateItemDto
+        {
+            Name = _model.Name,
+            Description = _model.Description,
+            Year = _model.Year,
+            Label = _model.Label,
+            Publisher = _model.Publisher,
+            Type = _model.Type,
+            ArtistIds = _selectedArtists.Select(a => a.Id).ToList(),
+        };
+
+        try
+        {
+            if (_model.CoverImageFile != null)
+            {
+                updateDto.CoverImagePath = await UploadFileAsync(_model.CoverImageFile, "cover");
+            }
+            else
+            {
+                updateDto.CoverImagePath = _model.ExistingCoverImagePath;
+            }
+
+            if (_model.BackImageFile != null)
+            {
+                updateDto.BackImagePath = await UploadFileAsync(_model.BackImageFile, "back");
+            }
+            else
+            {
+                updateDto.BackImagePath = _model.ExistingBackImagePath;
+            }
+
+            if (_model.BookletImageFiles.Count > 0)
+            {
+                foreach (var file in _model.BookletImageFiles)
+                {
+                    var path = await UploadFileAsync(file, "booklet");
+                    updateDto.BookletImagePaths.Add(path);
+                }
+            }
+            else
+            {
+                updateDto.BookletImagePaths = _model.ExistingBookletImagePaths;
+            }
+
+            foreach (var disc in _model.Discs)
+            {
+                var updateDiscDto = new UpdateDiscDto
+                {
+                    Id = disc.Id,
+                    Number = disc.Number,
+                    Type = disc.Type,
+                    Tracks = disc.Tracks.Select(t => new UpdateTrackDto
+                    {
+                        Id = t.Id,
+                        Name = t.Name,
+                        TrackNumber = t.TrackNumber,
+                        Duration = TimeSpan.Parse(t.Duration)
+                    }).ToList()
+                };
+
+                if (disc.DiscImageFile != null)
+                {
+                    updateDiscDto.DiscImagePath = await UploadFileAsync(disc.DiscImageFile, "disc");
+                } else
+                {
+                    updateDiscDto.DiscImagePath = disc.ExistingDiscImagePath;
+                }
+
+                updateDto.Discs.Add(updateDiscDto);
+            }
+
+            var response = await Http.PutAsJsonAsync($"api/items/{Id}", updateDto);
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo($"/item/{Id}");    
+            }
+            else
+            {
+                _error = "Failed to update the item.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = $"An unexpected error occurred: {ex.Message}";
+        }
+        finally
+        {
+            _isUpdating= false;
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        _error = "Please fill out all fields correctly before submitting.";
+    }
+
+    private async Task<string> UploadFileAsync(IBrowserFile file, string uploadType)
+    {
+        using var content = new MultipartFormDataContent();
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB limit
+        content.Add(new StreamContent(stream), "file", file.Name);
+
+        var response = await Http.PostAsync($"api/files/upload?uploadType={uploadType}", content);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<UploadResult>();
+            return result?.FilePath ?? string.Empty;
+        }
+        throw new Exception($"Failed to uplaod: {file.Name}");
+    }
+    private class UploadResult { public string? FilePath { get; set; } }
+
+    private void HandleBookletFilesSelected(InputFileChangeEventArgs e)
+    {
+        _error = null; // Clear previous errors
+        if (e.FileCount > MaxAllowedFiles)
+        {
+            _error = $"Error: Cannot upload more than {MaxAllowedFiles} files at once.";
+            _model.BookletImageFiles.Clear(); // Clear the selection
+            return;
+        }
+        _model.BookletImageFiles = e.GetMultipleFiles(MaxAllowedFiles).ToList();
+    }
+}

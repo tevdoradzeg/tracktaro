@@ -1,0 +1,148 @@
+@page "/admin/edit/artist/{Id:int}"
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
+@using TrackTaro.Shared.Dtos
+
+
+<div class="about-page container mt-5 ml-5">
+    @if (_isCheckingAuth)
+    {
+        <p>Checking authentication...</p>
+    }
+    else
+    {
+        <h1>Edit Artist</h1>
+        @if (_model != null)
+        {
+            <EditForm Model="@_model" OnValidSubmit="HandleUpdateArtist">
+                <DataAnnotationsValidator /> 
+                <div class="mb-3">
+                    <label>Name</label>
+                    <InputText class="form-control" @bind-Value="_model.Name" />
+                </div>
+                <div class="mb-3">
+                    <label>Country</label>
+                    <InputText class="form-control" @bind-Value="_model.Country" />
+                </div>
+
+                <hr/>
+                <div class="mb-3">
+                <label class="form-label">Members</label>
+                @if (_model.Members.Any())
+                {
+                    <ul class="list-group mb-2">
+                        @foreach (var member in _model.Members)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @member
+                                <button type="button" class="btn-close" aria-label="Remove" @onclick="() => RemoveMember(member)"></button>
+                            </li>
+                        }
+                    </ul>
+                }
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="New member name..." @bind="_newMemberName" />
+                    <button class="btn btn-outline-secondary" type="button" @onclick="AddMember">Add Member</button>
+                </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </EditForm>
+        }
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="alert alert-danger mt-3">
+                <strong>Error:</strong> @_errorMessage
+            </div>
+        }
+    }
+    
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private bool _isCheckingAuth = true;
+    private string? _errorMessage;
+    private string? _newMemberName;
+    private bool _artistInitialized = false;
+    private UpdateArtistDto _model = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var isAuthenticated = await AuthenticationService.IsAuthenticatedAsync();
+            if (!isAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+            }
+            else
+            {
+                _isCheckingAuth = false;
+                StateHasChanged(); // Re-render the component to show the content
+            }
+        }
+
+        if (!_artistInitialized)
+        {
+            try 
+            {
+                var artist = await Http.GetFromJsonAsync<ArtistDto>($"api/artists/{Id}");
+                if (artist != null)
+                {
+                    _model = new UpdateArtistDto
+                    {
+                        Name = artist.Name,
+                        Country = artist.Country,
+                        Members = artist.Members.Select(m => m.Name).ToList()
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = $"An error occurred while fetching the artist: {ex.Message}";
+            }
+            finally
+            {
+                _artistInitialized = true;
+                StateHasChanged(); // Ensure the component re-renders with the fetched data
+            }
+        }
+    }
+
+    private async Task HandleUpdateArtist()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/artists/{Id}", _model);
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo($"/artist/{Id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"An error occurred while updating the artist: {ex.Message}";
+        }
+    }
+
+    private void AddMember()
+    {
+        if (_model != null && !string.IsNullOrWhiteSpace(_newMemberName))
+        {
+            _model.Members.Add(_newMemberName);
+            _newMemberName = string.Empty; // Clear the input
+            StateHasChanged();
+        }
+    }
+
+    private void RemoveMember(string member)
+    {
+        _model?.Members.Remove(member);
+        StateHasChanged();
+    }
+}

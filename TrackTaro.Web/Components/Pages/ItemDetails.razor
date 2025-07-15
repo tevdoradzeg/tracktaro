@@ -1,5 +1,9 @@
 @page "/item/{Id:int}"
+@rendermode InteractiveServer
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
 @using TrackTaro.Shared.Dtos
 @using System.Text.Json
 
@@ -20,6 +24,10 @@ else if (!string.IsNullOrEmpty(_error))
 else if (_item != null)
 {
     <ItemFull Item="_item"/>
+    <div class="mt-3 mb-3">
+        <a href="/edit/item/@_item.Id" class="btn btn-secondary">Edit Item</a>
+        <button class="btn btn-danger" @onclick="DeleteItem">Delete Item</button>
+    </div>
 }
 else
 {
@@ -62,6 +70,37 @@ else
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private async Task DeleteItem()
+    {
+        if (!await AuthenticationService.IsAuthenticatedAsync())
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var confirm = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+        if (confirm)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"api/items/{Id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    _error = "Failed to delete the item.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _error = $"An error occurred while deleting the item: {ex.Message}";
+                StateHasChanged();
+            }
         }
     }
 }

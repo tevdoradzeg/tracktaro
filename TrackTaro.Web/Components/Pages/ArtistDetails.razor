@@ -1,5 +1,8 @@
 @page "/artist/{Id:int}"
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
 @using TrackTaro.Shared.Dtos
 @using System.Text.Json
 
@@ -43,6 +46,11 @@ else if (!string.IsNullOrEmpty(_error))
             <ItemRow Item="@item"/>
         }
         </ul>
+
+        <div class="mt-3 mb-3">
+            <a href="/admin/edit/artist/@_artist.Id" class="btn btn-secondary me-2">Edit</a>
+            <button class="btn btn-danger" @onclick="DeleteArtist">Delete</button>
+        </div>
     </div>
 }
 else
@@ -86,6 +94,37 @@ else
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private async Task DeleteArtist()
+    {
+        if (!await AuthenticationService.IsAuthenticatedAsync())
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var confirm = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this artist?");
+        if (confirm)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"api/artist/{Id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    _error = "Failed to delete the item.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _error = $"An error occurred while deleting the item: {ex.Message}";
+                StateHasChanged();
+            }
         }
     }
 }
